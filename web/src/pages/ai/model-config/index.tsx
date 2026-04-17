@@ -43,8 +43,7 @@ export function ModelConfigPage() {
 
     try {
       await deleteMutation.mutateAsync(deleteTarget.id);
-    }
-    finally {
+    } finally {
       setDeleteTarget(null);
       // 如果删除的是选中的项，清除选中状态
       if (wasSelected) {
@@ -104,7 +103,7 @@ export function ModelConfigPage() {
         description={`确定要删除配置"${deleteTarget?.name}"吗？此操作不可撤销。`}
         confirmText="删除"
         destructive
-        onOpenChange={open => !open && setDeleteTarget(null)}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
         onConfirm={handleConfirmDelete}
       />
     </div>

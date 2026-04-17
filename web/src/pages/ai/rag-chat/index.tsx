@@ -55,10 +55,9 @@ export function RagChatPage() {
   const fetchSessions = useCallback(async () => {
     try {
       // 模拟网络延迟
-      await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 200));
+      await new Promise((resolve) => setTimeout(resolve, 300 + Math.random() * 200));
       setSessions([...mockSessions]);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("获取会话列表失败:", error);
     }
   }, []);
@@ -129,7 +128,7 @@ export function RagChatPage() {
             <Input
               placeholder="搜索"
               value={searchValue}
-              onChange={e => setSearchValue(e.target.value)}
+              onChange={(e) => setSearchValue(e.target.value)}
               className="pl-8"
             />
           </div>

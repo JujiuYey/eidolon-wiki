@@ -10,20 +10,13 @@ interface ColorPickerPopoverProps {
   onChange: (color: string) => void;
 }
 
-export function ColorPickerPopover({
-  children,
-  color,
-  colors,
-  onChange,
-}: ColorPickerPopoverProps) {
+export function ColorPickerPopover({ children, color, colors, onChange }: ColorPickerPopoverProps) {
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        {children}
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="w-auto p-2">
         <div className="flex max-w-40 flex-wrap gap-1">
-          {colors.map(value => (
+          {colors.map((value) => (
             <button
               key={value}
               type="button"

@@ -80,11 +80,7 @@ function ToolCallItem({ toolCall }: { toolCall: AgentToolCall }) {
   );
 }
 
-export function ChatPanel({
-  messages,
-  loading,
-  onSend,
-}: ChatPanelProps) {
+export function ChatPanel({ messages, loading, onSend }: ChatPanelProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleSubmit = useCallback(
@@ -94,8 +90,7 @@ export function ChatPanel({
       setIsGenerating(true);
       try {
         await onSend(text);
-      }
-      finally {
+      } finally {
         setIsGenerating(false);
       }
     },
@@ -118,55 +113,47 @@ export function ChatPanel({
       {/* 消息列表 */}
       <Conversation>
         <ConversationContent>
-          {messages.length === 0
-            ? (
-                <ConversationEmptyState title="你好！我是 AI 系统助手">
-                  <div className="space-y-4">
-                    <p className="whitespace-pre-wrap text-sm">{WELCOME_CONTENT}</p>
-                    <Suggestions>
-                      {SUGGESTIONS.map(s => (
-                        <Suggestion
-                          key={s}
-                          suggestion={s}
-                          onClick={handleSuggestionClick}
-                        />
-                      ))}
-                    </Suggestions>
-                  </div>
-                </ConversationEmptyState>
-              )
-            : (
-                <>
-                  {messages.map(msg => (
-                    <Message key={msg.id} from={msg.role}>
-                      <MessageContent>
-                        <MessageResponse>
-                          {msg.content}
-                        </MessageResponse>
-                        {msg.tool_calls && msg.tool_calls.length > 0 && (
-                          <MessageToolbar>
-                            <div className="flex w-full flex-col gap-2">
-                              {msg.tool_calls.map(toolCall => (
-                                <ToolCallItem key={toolCall.id} toolCall={toolCall} />
-                              ))}
-                            </div>
-                          </MessageToolbar>
-                        )}
-                      </MessageContent>
-                    </Message>
+          {messages.length === 0 ? (
+            <ConversationEmptyState title="你好！我是 AI 系统助手">
+              <div className="space-y-4">
+                <p className="whitespace-pre-wrap text-sm">{WELCOME_CONTENT}</p>
+                <Suggestions>
+                  {SUGGESTIONS.map((s) => (
+                    <Suggestion key={s} suggestion={s} onClick={handleSuggestionClick} />
                   ))}
-                  {loading && (
-                    <Message from="assistant">
-                      <MessageContent>
-                        <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                          <Loader2Icon className="size-4 animate-spin" />
-                          <span>思考中...</span>
+                </Suggestions>
+              </div>
+            </ConversationEmptyState>
+          ) : (
+            <>
+              {messages.map((msg) => (
+                <Message key={msg.id} from={msg.role}>
+                  <MessageContent>
+                    <MessageResponse>{msg.content}</MessageResponse>
+                    {msg.tool_calls && msg.tool_calls.length > 0 && (
+                      <MessageToolbar>
+                        <div className="flex w-full flex-col gap-2">
+                          {msg.tool_calls.map((toolCall) => (
+                            <ToolCallItem key={toolCall.id} toolCall={toolCall} />
+                          ))}
                         </div>
-                      </MessageContent>
-                    </Message>
-                  )}
-                </>
+                      </MessageToolbar>
+                    )}
+                  </MessageContent>
+                </Message>
+              ))}
+              {loading && (
+                <Message from="assistant">
+                  <MessageContent>
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <Loader2Icon className="size-4 animate-spin" />
+                      <span>思考中...</span>
+                    </div>
+                  </MessageContent>
+                </Message>
               )}
+            </>
+          )}
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>

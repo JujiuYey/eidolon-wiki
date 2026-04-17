@@ -45,12 +45,7 @@ export const queueApi = {
     }),
 
   // 获取任务列表
-  listTasks: (
-    queueName = "default",
-    state = "pending",
-    pageSize = 20,
-    page = 0,
-  ) =>
+  listTasks: (queueName = "default", state = "pending", pageSize = 20, page = 0) =>
     request.get<TaskListResponse>(`${RESOURCE_PATH}/tasks`, {
       params: {
         queue: queueName,

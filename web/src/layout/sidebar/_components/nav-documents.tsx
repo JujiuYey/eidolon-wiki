@@ -1,8 +1,4 @@
-import {
-  IconDatabase,
-  IconFileDescription,
-  IconFilePencil,
-} from "@tabler/icons-react";
+import { IconDatabase, IconFileDescription, IconFilePencil } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 
 import {
@@ -36,7 +32,7 @@ export function NavDocuments() {
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>知识中心</SidebarGroupLabel>
       <SidebarMenu>
-        {data.map(item => (
+        {data.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <Link to={item.url}>

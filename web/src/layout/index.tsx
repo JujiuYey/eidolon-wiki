@@ -13,12 +13,15 @@ export function LayoutComponent() {
   useEffect(() => {
     // 如果有 token 但没有用户信息，则获取用户信息
     if (accessToken && !user) {
-      authApi.getCurrentUser().then((userInfo) => {
-        setUser(userInfo);
-      }).catch(() => {
-        // 获取用户信息失败，可能是 token 过期
-        console.error("获取用户信息失败");
-      });
+      authApi
+        .getCurrentUser()
+        .then((userInfo) => {
+          setUser(userInfo);
+        })
+        .catch(() => {
+          // 获取用户信息失败，可能是 token 过期
+          console.error("获取用户信息失败");
+        });
     }
   }, [accessToken, user, setUser]);
 

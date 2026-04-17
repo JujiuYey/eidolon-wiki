@@ -36,13 +36,7 @@ describe("EditorCatalog", () => {
     const editor = createEditorStub();
     const onToggle = vi.fn();
 
-    render(
-      <EditorCatalog
-        editor={editor as never}
-        open
-        onToggle={onToggle}
-      />,
-    );
+    render(<EditorCatalog editor={editor as never} open onToggle={onToggle} />);
 
     expect(screen.getByRole("button", { name: "第一章" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "第一节" })).toBeInTheDocument();
@@ -59,11 +53,7 @@ describe("EditorCatalog", () => {
   it("returns null when the catalog is closed", () => {
     const editor = createEditorStub();
     const { container } = render(
-      <EditorCatalog
-        editor={editor as never}
-        open={false}
-        onToggle={vi.fn()}
-      />,
+      <EditorCatalog editor={editor as never} open={false} onToggle={vi.fn()} />,
     );
 
     expect(container).toBeEmptyDOMElement();

@@ -38,8 +38,7 @@ export function ConfirmDialog({
     setLoading(true);
     try {
       await onConfirm();
-    }
-    finally {
+    } finally {
       setLoading(false);
       onOpenChange(false);
     }
@@ -53,9 +52,7 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>
-            {cancelText}
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>{cancelText}</AlertDialogCancel>
           <AlertDialogAction
             variant={destructive ? "destructive" : "default"}
             disabled={loading}

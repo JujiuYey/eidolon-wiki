@@ -48,6 +48,5 @@ export function ToolbarButton({
         <p>{title}</p>
       </TooltipContent>
     </Tooltip>
-
   );
 }

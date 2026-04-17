@@ -1,7 +1,15 @@
 import { useCallback, useState } from "react";
 
 import type { PaperSize } from "../_shared/const";
-import { DEFAULT_MARGINS, DEFAULT_PAPER_SIZE, parsePaperSize, ZOOM_DEFAULT, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from "../_shared/const";
+import {
+  DEFAULT_MARGINS,
+  DEFAULT_PAPER_SIZE,
+  parsePaperSize,
+  ZOOM_DEFAULT,
+  ZOOM_MAX,
+  ZOOM_MIN,
+  ZOOM_STEP,
+} from "../_shared/const";
 
 export interface PageMargins {
   top: number;
@@ -32,14 +40,13 @@ export function useEditorPageSetup(): EditorPageSetup {
   const [margins, setMarginsRaw] = useState<PageMargins>({ ...DEFAULT_MARGINS });
   const [paperSize, setPaperSizeRaw] = useState<PaperSize>({ ...DEFAULT_PAPER_SIZE });
 
-  const zoomIn = useCallback(() => setZoomRaw(z => clampZoom(z + ZOOM_STEP)), []);
-  const zoomOut = useCallback(() => setZoomRaw(z => clampZoom(z - ZOOM_STEP)), []);
+  const zoomIn = useCallback(() => setZoomRaw((z) => clampZoom(z + ZOOM_STEP)), []);
+  const zoomOut = useCallback(() => setZoomRaw((z) => clampZoom(z - ZOOM_STEP)), []);
   const zoomReset = useCallback(() => setZoomRaw(ZOOM_DEFAULT), []);
   const setZoom = useCallback((v: number) => setZoomRaw(clampZoom(v)), []);
 
   const setMargins = useCallback(
-    (partial: Partial<PageMargins>) =>
-      setMarginsRaw(prev => ({ ...prev, ...partial })),
+    (partial: Partial<PageMargins>) => setMarginsRaw((prev) => ({ ...prev, ...partial })),
     [],
   );
   const resetMargins = useCallback(() => setMarginsRaw({ ...DEFAULT_MARGINS }), []);
@@ -48,5 +55,16 @@ export function useEditorPageSetup(): EditorPageSetup {
     setPaperSizeRaw(parsePaperSize(value));
   }, []);
 
-  return { zoom, margins, paperSize, zoomIn, zoomOut, zoomReset, setZoom, setMargins, resetMargins, setPaperSize };
+  return {
+    zoom,
+    margins,
+    paperSize,
+    zoomIn,
+    zoomOut,
+    zoomReset,
+    setZoom,
+    setMargins,
+    resetMargins,
+    setPaperSize,
+  };
 }

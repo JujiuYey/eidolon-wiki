@@ -16,12 +16,8 @@ interface SpeechRecognition extends EventTarget {
   stop(): void;
   onstart: ((this: SpeechRecognition, ev: Event) => void) | null;
   onend: ((this: SpeechRecognition, ev: Event) => void) | null;
-  onresult:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void)
-    | null;
-  onerror:
-    | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void)
-    | null;
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
+  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void) | null;
 }
 
 interface SpeechRecognitionEvent extends Event {
@@ -103,11 +99,9 @@ export const SpeechInput = ({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const onTranscriptionChangeRef = useRef<
-    SpeechInputProps["onTranscriptionChange"]
-  >(onTranscriptionChange);
-  const onAudioRecordedRef
-    = useRef<SpeechInputProps["onAudioRecorded"]>(onAudioRecorded);
+  const onTranscriptionChangeRef =
+    useRef<SpeechInputProps["onTranscriptionChange"]>(onTranscriptionChange);
+  const onAudioRecordedRef = useRef<SpeechInputProps["onAudioRecorded"]>(onAudioRecorded);
 
   // Keep refs in sync
   onTranscriptionChangeRef.current = onTranscriptionChange;
@@ -119,8 +113,7 @@ export const SpeechInput = ({
       return;
     }
 
-    const SpeechRecognition
-      = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const speechRecognition = new SpeechRecognition();
 
     speechRecognition.continuous = true;
@@ -139,11 +132,7 @@ export const SpeechInput = ({
       const speechEvent = event as SpeechRecognitionEvent;
       let finalTranscript = "";
 
-      for (
-        let i = speechEvent.resultIndex;
-        i < speechEvent.results.length;
-        i += 1
-      ) {
+      for (let i = speechEvent.resultIndex; i < speechEvent.results.length; i += 1) {
         const result = speechEvent.results[i];
         if (result.isFinal) {
           finalTranscript += result[0]?.transcript ?? "";
@@ -228,11 +217,9 @@ export const SpeechInput = ({
             if (transcript) {
               onTranscriptionChangeRef.current?.(transcript);
             }
-          }
-          catch {
+          } catch {
             // Error handling delegated to the onAudioRecorded caller
-          }
-          finally {
+          } finally {
             setIsProcessing(false);
           }
         }
@@ -253,8 +240,7 @@ export const SpeechInput = ({
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorder.start();
       setIsListening(true);
-    }
-    catch {
+    } catch {
       setIsListening(false);
     }
   }, []);
@@ -271,33 +257,30 @@ export const SpeechInput = ({
     if (mode === "speech-recognition" && recognitionRef.current) {
       if (isListening) {
         recognitionRef.current.stop();
-      }
-      else {
+      } else {
         recognitionRef.current.start();
       }
-    }
-    else if (mode === "media-recorder") {
+    } else if (mode === "media-recorder") {
       if (isListening) {
         stopMediaRecorder();
-      }
-      else {
+      } else {
         startMediaRecorder();
       }
     }
   }, [mode, isListening, startMediaRecorder, stopMediaRecorder]);
 
   // Determine if button should be disabled
-  const isDisabled
-    = mode === "none"
-      || (mode === "speech-recognition" && !isRecognitionReady)
-      || (mode === "media-recorder" && !onAudioRecorded)
-      || isProcessing;
+  const isDisabled =
+    mode === "none" ||
+    (mode === "speech-recognition" && !isRecognitionReady) ||
+    (mode === "media-recorder" && !onAudioRecorded) ||
+    isProcessing;
 
   return (
     <div className="relative inline-flex items-center justify-center">
       {/* Animated pulse rings */}
-      {isListening
-        && [0, 1, 2].map(index => (
+      {isListening &&
+        [0, 1, 2].map((index) => (
           <div
             className="absolute inset-0 animate-ping rounded-full border-2 border-red-400/30"
             key={index}

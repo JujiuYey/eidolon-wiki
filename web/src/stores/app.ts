@@ -19,14 +19,13 @@ const defaultSettings: AppSettings = {
 
 export const useAppStore = create<AppState>()(
   persist(
-    set => ({
+    (set) => ({
       settings: { ...defaultSettings },
-      updateSettings: partial =>
-        set(state => ({
+      updateSettings: (partial) =>
+        set((state) => ({
           settings: { ...state.settings, ...partial },
         })),
-      resetSettings: () =>
-        set({ settings: { ...defaultSettings } }),
+      resetSettings: () => set({ settings: { ...defaultSettings } }),
     }),
     {
       name: "app-setting",

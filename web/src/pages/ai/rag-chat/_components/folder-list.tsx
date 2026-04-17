@@ -27,11 +27,9 @@ export function FolderList({ value, onChange }: FolderListProps) {
         if (all.length > 0 && !value) {
           onChange(all[0]!.id);
         }
-      }
-      catch {
+      } catch {
         toast.error("加载文件夹失败");
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -50,25 +48,23 @@ export function FolderList({ value, onChange }: FolderListProps) {
 
   return (
     <div className={cn("h-full overflow-auto pb-12 p-4 space-y-1")}>
-      {folders.length === 0
-        ? (
-            <div className="flex items-center justify-center p-8">
-              <span className="text-sm text-muted-foreground">暂无文件夹</span>
-            </div>
-          )
-        : (
-            folders.map(folder => (
-              <Button
-                key={folder.id}
-                variant={value === folder.id ? "default" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => onChange(folder.id)}
-              >
-                <IconFolder className="mr-2 h-4 w-4" />
-                {folder.name}
-              </Button>
-            ))
-          )}
+      {folders.length === 0 ? (
+        <div className="flex items-center justify-center p-8">
+          <span className="text-sm text-muted-foreground">暂无文件夹</span>
+        </div>
+      ) : (
+        folders.map((folder) => (
+          <Button
+            key={folder.id}
+            variant={value === folder.id ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => onChange(folder.id)}
+          >
+            <IconFolder className="mr-2 h-4 w-4" />
+            {folder.name}
+          </Button>
+        ))
+      )}
     </div>
   );
 }

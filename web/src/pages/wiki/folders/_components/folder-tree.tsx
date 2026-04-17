@@ -21,11 +21,9 @@ export function FolderTree({ data, selectedId, onSelect, className }: FolderTree
     try {
       const data = await folderApi.tree();
       setInternalTreeData(data || []);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("加载文件夹树失败:", error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   }, []);
@@ -53,7 +51,7 @@ export function FolderTree({ data, selectedId, onSelect, className }: FolderTree
       selectedId={selectedId}
       onSelect={onSelect}
       renderNode={renderFolderNode}
-      hasChildren={folder => folder.hasChildren}
+      hasChildren={(folder) => folder.hasChildren}
       className={className}
       rootLabel="根目录"
       rootIcon={<Home className="size-4 text-primary shrink-0" />}

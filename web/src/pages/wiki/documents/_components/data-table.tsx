@@ -71,11 +71,12 @@ const ChunkDetail = ({ docId }: { docId: string }) => {
   console.log("🚀 ~ ChunkDetail ~ chunksData:", chunksData);
 
   if (isLoading) return <div className="p-2 text-sm text-muted-foreground">加载中...</div>;
-  if (!chunksData?.chunks?.length) return <div className="p-2 text-sm text-muted-foreground">暂无 chunk 数据</div>;
+  if (!chunksData?.chunks?.length)
+    return <div className="p-2 text-sm text-muted-foreground">暂无 chunk 数据</div>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-2 max-h-[60vh] overflow-y-auto">
-      {chunksData.chunks.map(chunk => (
+      {chunksData.chunks.map((chunk) => (
         <div key={chunk.ChunkId} className="border rounded p-2 text-sm">
           <div className="flex justify-between items-start">
             <span className="font-medium">
@@ -83,17 +84,10 @@ const ChunkDetail = ({ docId }: { docId: string }) => {
               {chunk.ChunkIndex + 1}
             </span>
             <span className="text-muted-foreground text-xs">
-              {chunk.ChunkSize}
-              {" "}
-              字符 |
-              {chunk.VectorDim}
-              {" "}
-              维
+              {chunk.ChunkSize} 字符 |{chunk.VectorDim} 维
             </span>
           </div>
-          <p className="mt-1 text-muted-foreground line-clamp-3">
-            {chunk.ChunkText}
-          </p>
+          <p className="mt-1 text-muted-foreground line-clamp-3">{chunk.ChunkText}</p>
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="link" size="sm" className="mt-1 h-auto p-0">
@@ -167,10 +161,7 @@ export function DocumentDataTable({
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <IconFileText className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span
-              className="max-w-75 truncate font-medium"
-              title={row.original.filename}
-            >
+            <span className="max-w-75 truncate font-medium" title={row.original.filename}>
               {row.original.filename}
             </span>
           </div>
@@ -179,11 +170,7 @@ export function DocumentDataTable({
       {
         accessorKey: "file_size",
         header: () => <div className="text-center">大小</div>,
-        cell: ({ row }) => (
-          <div className="w-20">
-            {formatFileSize(row.original.file_size)}
-          </div>
-        ),
+        cell: ({ row }) => <div className="w-20">{formatFileSize(row.original.file_size)}</div>,
       },
       {
         accessorKey: "status",
@@ -191,10 +178,7 @@ export function DocumentDataTable({
         cell: ({ row }) => {
           const status = row.original.status;
           return (
-            <Badge
-              variant="secondary"
-              className={getStatusClass(status)}
-            >
+            <Badge variant="secondary" className={getStatusClass(status)}>
               {getStatusText(status)}
             </Badge>
           );
@@ -203,11 +187,7 @@ export function DocumentDataTable({
       {
         accessorKey: "chunk_count",
         header: () => <div className="text-center">分块数</div>,
-        cell: ({ row }) => (
-          <div className="text-muted-foreground">
-            {row.original.chunk_count}
-          </div>
-        ),
+        cell: ({ row }) => <div className="text-muted-foreground">{row.original.chunk_count}</div>,
       },
       {
         accessorKey: "created_at",
@@ -215,9 +195,7 @@ export function DocumentDataTable({
         cell: ({ row }) => {
           const date = new Date(row.original.created_at);
           return (
-            <div className="text-muted-foreground w-37.5">
-              {date.toLocaleDateString("zh-CN")}
-            </div>
+            <div className="text-muted-foreground w-37.5">{date.toLocaleDateString("zh-CN")}</div>
           );
         },
       },
@@ -226,8 +204,7 @@ export function DocumentDataTable({
         header: () => <div className="text-center">操作</div>,
         cell: ({ row }) => {
           const doc = row.original;
-          const showProcessBtn
-            = doc.status === "pending" || doc.status === "failed";
+          const showProcessBtn = doc.status === "pending" || doc.status === "failed";
           const showChunksBtn = doc.status === "completed";
 
           return (
@@ -313,11 +290,13 @@ export function DocumentDataTable({
           onPageChange,
           onPageSizeChange,
         }}
-        onRowClick={onRowClick
-          ? (doc) => {
-              if (doc.status === "completed") onRowClick(doc);
-            }
-          : undefined}
+        onRowClick={
+          onRowClick
+            ? (doc) => {
+                if (doc.status === "completed") onRowClick(doc);
+              }
+            : undefined
+        }
       />
 
       {/* Chunk Detail Dialog */}
@@ -330,9 +309,7 @@ export function DocumentDataTable({
               Chunk 详情
             </DialogTitle>
           </DialogHeader>
-          {selectedDocForChunks && (
-            <ChunkDetail docId={selectedDocForChunks.id} />
-          )}
+          {selectedDocForChunks && <ChunkDetail docId={selectedDocForChunks.id} />}
         </DialogContent>
       </Dialog>
     </>

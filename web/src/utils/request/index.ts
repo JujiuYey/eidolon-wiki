@@ -24,7 +24,7 @@ function subscribeTokenRefresh(cb: (token: string) => void) {
 }
 
 function onRefreshed(token: string) {
-  refreshSubscribers.forEach(cb => cb(token));
+  refreshSubscribers.forEach((cb) => cb(token));
   refreshSubscribers = [];
 }
 
@@ -41,9 +41,10 @@ async function refreshToken(): Promise<string | null> {
       setAccessToken(data.data.access_token);
       return data.data.access_token;
     }
-  }
-  catch (error) {
-    toast.error("刷新 token 失败", { description: error instanceof Error ? error.message : "未知错误" });
+  } catch (error) {
+    toast.error("刷新 token 失败", {
+      description: error instanceof Error ? error.message : "未知错误",
+    });
   }
   return null;
 }
@@ -63,7 +64,7 @@ instance.interceptors.request.use((config) => {
 
 // 响应拦截器
 instance.interceptors.response.use(
-  response => response,
+  (response) => response,
   async (error) => {
     if (axios.isCancel(error)) {
       toast.error("请求已取消");
@@ -80,10 +81,10 @@ instance.interceptors.response.use(
 
     // 401 处理：尝试刷新 token
     if (
-      status === 401
-      && !originalRequest._retry
-      && !originalRequest.url?.includes("/auth/login")
-      && !originalRequest.url?.includes("/auth/refresh")
+      status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/auth/login") &&
+      !originalRequest.url?.includes("/auth/refresh")
     ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -107,8 +108,7 @@ instance.interceptors.response.use(
         useAuthStore.getState().clearAuth();
         window.location.href = "/login";
         return Promise.reject(new Error("登录已过期"));
-      }
-      finally {
+      } finally {
         isRefreshing = false;
       }
     }
@@ -120,7 +120,9 @@ instance.interceptors.response.use(
 );
 
 // 业务解包
-async function unwrap<T>(promise: Promise<import("axios").AxiosResponse<ApiResponse<T>>>): Promise<T> {
+async function unwrap<T>(
+  promise: Promise<import("axios").AxiosResponse<ApiResponse<T>>>,
+): Promise<T> {
   const res = await promise;
   const json = res.data;
   if (json.code === 0) return json.data;

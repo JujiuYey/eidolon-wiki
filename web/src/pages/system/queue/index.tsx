@@ -5,13 +5,7 @@ import { toast } from "sonner";
 import type { QueueStats, TaskInfo } from "@/api/system/queue";
 import { queueApi } from "@/api/system/queue";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
@@ -33,8 +27,7 @@ export function QueuePage() {
     try {
       const data = await queueApi.getStats();
       setStats(data);
-    }
-    catch (error: any) {
+    } catch (error: any) {
       toast.error("加载统计失败", {
         description: error.response?.data?.error || "获取队列统计失败",
       });
@@ -44,21 +37,14 @@ export function QueuePage() {
   const loadTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await queueApi.listTasks(
-        "default",
-        currentState,
-        pageSize,
-        currentPage,
-      );
+      const response = await queueApi.listTasks("default", currentState, pageSize, currentPage);
       setTasks(response.tasks || []);
       setTotal(response.total);
-    }
-    catch (error: any) {
+    } catch (error: any) {
       toast.error("加载任务失败", {
         description: error.response?.data?.error || "获取任务列表失败",
       });
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   }, [currentState, pageSize, currentPage]);
@@ -78,8 +64,7 @@ export function QueuePage() {
       refreshIntervalRef.current = window.setInterval(() => {
         refreshData();
       }, 5000);
-    }
-    else {
+    } else {
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current);
         refreshIntervalRef.current = null;
@@ -110,16 +95,11 @@ export function QueuePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">队列监控</h1>
-          <p className="text-muted-foreground text-sm">
-            实时监控任务队列状态和执行情况
-          </p>
+          <p className="text-muted-foreground text-sm">实时监控任务队列状态和执行情况</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Switch
-              checked={autoRefresh}
-              onCheckedChange={setAutoRefresh}
-            />
+            <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh} />
             <Label className="text-sm">自动刷新</Label>
           </div>
           <Button size="sm" variant="outline" onClick={() => refreshData()}>

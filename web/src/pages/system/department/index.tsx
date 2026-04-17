@@ -39,12 +39,10 @@ export function DepartmentPage() {
       const result = tree || [];
       setData(result);
       setDepartmentTree(result);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("加载部门树失败:", error);
       toast.error("加载部门失败");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -79,8 +77,7 @@ export function DepartmentPage() {
       await departmentApi.delete(deleteTarget.id);
       toast.success("删除成功");
       loadDepartmentTree();
-    }
-    catch (error) {
+    } catch (error) {
       toast.error(`删除失败，${error}`);
     }
   };
@@ -92,19 +89,16 @@ export function DepartmentPage() {
       if (formMode === "create") {
         await departmentApi.create(formData as CreateDepartmentRequest);
         toast.success("创建成功");
-      }
-      else {
+      } else {
         await departmentApi.update(formData as UpdateDepartmentRequest);
         toast.success("更新成功");
       }
       setFormOpen(false);
       loadDepartmentTree();
-    }
-    catch (error) {
+    } catch (error) {
       console.error("保存部门失败:", error);
       toast.error(formMode === "create" ? "创建失败" : "更新失败");
-    }
-    finally {
+    } finally {
       setSubmitting(false);
     }
   };
@@ -127,7 +121,7 @@ export function DepartmentPage() {
             <Input
               placeholder="搜索部门..."
               value={globalFilter}
-              onChange={e => setGlobalFilter(e.target.value)}
+              onChange={(e) => setGlobalFilter(e.target.value)}
               className="pl-9"
             />
           </div>
@@ -162,7 +156,9 @@ export function DepartmentPage() {
         description={`确定要删除部门"${deleteTarget?.name}"吗？`}
         confirmText="删除"
         destructive
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
         onConfirm={handleConfirmDelete}
       />
     </>

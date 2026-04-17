@@ -50,7 +50,7 @@ export function NavSystem() {
       <SidebarGroupLabel>系统管理</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {data.map(item => (
+          {data.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title} asChild>
                 <Link to={item.url}>

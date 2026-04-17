@@ -3,10 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { documentApi } from "@/api/wiki/document";
-import {
-  folderApi,
-  type FolderTreeNode,
-} from "@/api/wiki/folder";
+import { folderApi, type FolderTreeNode } from "@/api/wiki/folder";
 import { TreeSelect, type TreeSelectItem } from "@/components/sag-ui/tree-select";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +24,7 @@ interface UploadDialogProps {
 }
 
 function folderTreeToTreeSelectItems(nodes: FolderTreeNode[]): TreeSelectItem<FolderTreeNode>[] {
-  return nodes.map(node => ({
+  return nodes.map((node) => ({
     value: node.id,
     label: node.name,
     node,
@@ -54,8 +51,7 @@ export function UploadDialog({
       try {
         const tree = await folderApi.tree();
         setFallbackFolderTree(tree || []);
-      }
-      catch {
+      } catch {
         toast.error("加载文件夹列表失败");
       }
     };
@@ -115,11 +111,9 @@ export function UploadDialog({
       });
       onOpenChange(false);
       onSuccess?.();
-    }
-    catch {
+    } catch {
       // 错误已在拦截器中处理
-    }
-    finally {
+    } finally {
       setUploading(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -132,9 +126,7 @@ export function UploadDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>上传文档</DialogTitle>
-          <DialogDescription>
-            选择文件夹并上传文档文件
-          </DialogDescription>
+          <DialogDescription>选择文件夹并上传文档文件</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -143,7 +135,7 @@ export function UploadDialog({
             <TreeSelect
               items={folderTreeItems}
               value={selectedFolderId}
-              onValueChange={value => setSelectedFolderId(value)}
+              onValueChange={(value) => setSelectedFolderId(value)}
               placeholder="请选择文件夹"
               className="w-full"
               emptyMessage="暂无文件夹"
@@ -156,26 +148,18 @@ export function UploadDialog({
               className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
-              {selectedFile
-                ? (
-                    <div className="text-center">
-                      <p className="text-sm font-medium">{selectedFile.name}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        点击重新选择
-                      </p>
-                    </div>
-                  )
-                : (
-                    <div className="text-center">
-                      <IconUpload className="mx-auto h-8 w-8 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground mt-2">
-                        点击选择文件
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        支持 .md 文件
-                      </p>
-                    </div>
-                  )}
+              {selectedFile ? (
+                <div className="text-center">
+                  <p className="text-sm font-medium">{selectedFile.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1">点击重新选择</p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <IconUpload className="mx-auto h-8 w-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground mt-2">点击选择文件</p>
+                  <p className="text-xs text-muted-foreground">支持 .md 文件</p>
+                </div>
+              )}
             </div>
             <input
               ref={fileInputRef}
@@ -188,30 +172,21 @@ export function UploadDialog({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={uploading}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={uploading}>
             取消
           </Button>
-          <Button
-            onClick={handleUpload}
-            disabled={uploading || !selectedFile || !selectedFolderId}
-          >
-            {uploading
-              ? (
-                  <>
-                    <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
-                    上传中...
-                  </>
-                )
-              : (
-                  <>
-                    <IconUpload className="mr-2 h-4 w-4" />
-                    上传
-                  </>
-                )}
+          <Button onClick={handleUpload} disabled={uploading || !selectedFile || !selectedFolderId}>
+            {uploading ? (
+              <>
+                <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                上传中...
+              </>
+            ) : (
+              <>
+                <IconUpload className="mr-2 h-4 w-4" />
+                上传
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

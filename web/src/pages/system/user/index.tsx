@@ -47,12 +47,10 @@ export function UserPage() {
       const res = await userApi.page(page, pageSize, searchKeyword || undefined);
       setData(res.data || []);
       setTotal(res.total || 0);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("加载用户列表失败:", error);
       toast.error("加载用户列表失败");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -66,8 +64,7 @@ export function UserPage() {
       ]);
       setDepartmentOptions(deptOpts || []);
       setRoleOptions(roleRes.data || []);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("加载选项失败:", error);
     }
   };
@@ -111,8 +108,7 @@ export function UserPage() {
       await userApi.delete(deleteTarget.id);
       toast.success("删除成功");
       loadUsers();
-    }
-    catch (error) {
+    } catch (error) {
       toast.error(`删除失败，${error}`);
     }
   };
@@ -127,8 +123,7 @@ export function UserPage() {
     try {
       await userApi.resetPassword({ id: resetPasswordTarget.id });
       toast.success("密码已重置");
-    }
-    catch (error) {
+    } catch (error) {
       toast.error(`重置密码失败，${error}`);
     }
   };
@@ -140,19 +135,16 @@ export function UserPage() {
       if (formMode === "create") {
         await userApi.create(formData as CreateUserRequest);
         toast.success("创建成功");
-      }
-      else {
+      } else {
         await userApi.update(formData as UpdateUserRequest);
         toast.success("更新成功");
       }
       setFormOpen(false);
       loadUsers();
-    }
-    catch (error) {
+    } catch (error) {
       console.error("保存用户失败:", error);
       toast.error(formMode === "create" ? "创建失败" : "更新失败");
-    }
-    finally {
+    } finally {
       setSubmitting(false);
     }
   };
@@ -180,8 +172,8 @@ export function UserPage() {
             <Input
               placeholder="搜索用户..."
               value={searchKeyword}
-              onChange={e => setSearchKeyword(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleSearch()}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="pl-9"
             />
           </div>
@@ -221,7 +213,9 @@ export function UserPage() {
         description={`确定要删除用户"${deleteTarget?.username}"吗？`}
         confirmText="删除"
         destructive
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
         onConfirm={handleConfirmDelete}
       />
 
@@ -230,7 +224,9 @@ export function UserPage() {
         title="重置密码"
         description={`确定要重置用户"${resetPasswordTarget?.username}"的密码吗？`}
         confirmText="重置"
-        onOpenChange={(open) => { if (!open) setResetPasswordTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setResetPasswordTarget(null);
+        }}
         onConfirm={handleConfirmResetPassword}
       />
     </>

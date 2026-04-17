@@ -2,7 +2,11 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect } from "react";
 import { z } from "zod";
 
-import type { CreateDepartmentRequest, Department, UpdateDepartmentRequest } from "@/api/system/department";
+import type {
+  CreateDepartmentRequest,
+  Department,
+  UpdateDepartmentRequest,
+} from "@/api/system/department";
 import { TreeSelect, type TreeSelectItem } from "@/components/sag-ui/tree-select";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,11 +55,13 @@ function departmentToTreeSelectItems(
       }
       return true;
     })
-    .map(dept => ({
+    .map((dept) => ({
       value: dept.id,
       label: dept.name,
       node: dept,
-      children: dept.children ? departmentToTreeSelectItems(dept.children, mode, currentDepartment) : undefined,
+      children: dept.children
+        ? departmentToTreeSelectItems(dept.children, mode, currentDepartment)
+        : undefined,
     }));
 }
 
@@ -85,8 +91,7 @@ export function DepartmentFormModal({
           description: value.description || undefined,
           parent_id: value.parent_id || undefined,
         });
-      }
-      else {
+      } else {
         onSubmit({
           id: department!.id,
           name: value.name,
@@ -132,23 +137,18 @@ export function DepartmentFormModal({
         >
           <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
             {/* 部门名称 */}
-            <form.Field
-              name="name"
-              validators={{ onChange: departmentFormSchema.shape.name }}
-            >
-              {field => (
+            <form.Field name="name" validators={{ onChange: departmentFormSchema.shape.name }}>
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="name">
-                    部门名称
-                    {" "}
-                    <span className="text-destructive">*</span>
+                    部门名称 <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="name"
                     placeholder="请输入部门名称"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={e => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs">
@@ -161,13 +161,13 @@ export function DepartmentFormModal({
 
             {/* 上级部门 */}
             <form.Field name="parent_id">
-              {field => (
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="parent_id">上级部门</Label>
                   <TreeSelect
                     items={departmentTreeItems}
                     value={field.state.value}
-                    onValueChange={value => field.handleChange(value || undefined)}
+                    onValueChange={(value) => field.handleChange(value || undefined)}
                     placeholder="请选择上级部门（可选）"
                     className="w-full"
                     allowClear
@@ -182,7 +182,7 @@ export function DepartmentFormModal({
               name="description"
               validators={{ onChange: departmentFormSchema.shape.description }}
             >
-              {field => (
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="description">描述</Label>
                   <Input
@@ -190,7 +190,7 @@ export function DepartmentFormModal({
                     placeholder="请输入部门描述（可选）"
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
-                    onChange={e => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs">
@@ -203,11 +203,7 @@ export function DepartmentFormModal({
           </div>
           <DialogFooter>
             <Button type="submit" disabled={loading}>
-              {loading
-                ? "保存中..."
-                : mode === "create"
-                  ? "创建"
-                  : "保存"}
+              {loading ? "保存中..." : mode === "create" ? "创建" : "保存"}
             </Button>
           </DialogFooter>
         </form>

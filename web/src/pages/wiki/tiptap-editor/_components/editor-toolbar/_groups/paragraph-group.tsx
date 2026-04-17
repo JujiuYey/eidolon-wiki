@@ -1,12 +1,5 @@
 import type { Editor } from "@tiptap/react";
-import {
-  AlignCenter,
-  AlignJustify,
-  AlignLeft,
-  AlignRight,
-  List,
-  ListOrdered,
-} from "lucide-react";
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, List, ListOrdered } from "lucide-react";
 
 import { useToolbarContext } from "../_context/toolbar-context";
 import { ToolbarButton } from "../_primitives/toolbar-button";
@@ -47,7 +40,11 @@ export function ParagraphGroup() {
             return;
           }
 
-          editor.chain().focus().toggleHeading({ level: Number(value.slice(1)) }).run();
+          editor
+            .chain()
+            .focus()
+            .toggleHeading({ level: Number(value.slice(1)) })
+            .run();
         }}
       />
       <ToolbarButton

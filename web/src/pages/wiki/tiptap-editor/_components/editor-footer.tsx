@@ -61,13 +61,7 @@ export function EditorFooter({ saveStatus, wordCount, onSave, pageSetup }: Edito
         </Button>
         <Popover open={marginOpen} onOpenChange={setMarginOpen}>
           <PopoverTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs"
-              title="页边距"
-            >
+            <Button type="button" variant="ghost" size="sm" className="h-7 text-xs" title="页边距">
               <Ruler className="mr-1 h-3 w-3" />
               边距
             </Button>
@@ -77,22 +71,22 @@ export function EditorFooter({ saveStatus, wordCount, onSave, pageSetup }: Edito
               <MarginInput
                 label="上"
                 value={pageSetup.margins.top}
-                onChange={v => pageSetup.setMargins({ top: v })}
+                onChange={(v) => pageSetup.setMargins({ top: v })}
               />
               <MarginInput
                 label="下"
                 value={pageSetup.margins.bottom}
-                onChange={v => pageSetup.setMargins({ bottom: v })}
+                onChange={(v) => pageSetup.setMargins({ bottom: v })}
               />
               <MarginInput
                 label="左"
                 value={pageSetup.margins.left}
-                onChange={v => pageSetup.setMargins({ left: v })}
+                onChange={(v) => pageSetup.setMargins({ left: v })}
               />
               <MarginInput
                 label="右"
                 value={pageSetup.margins.right}
-                onChange={v => pageSetup.setMargins({ right: v })}
+                onChange={(v) => pageSetup.setMargins({ right: v })}
               />
             </div>
             <Button
@@ -150,17 +144,13 @@ function MarginInput({
 }) {
   return (
     <div className="space-y-1">
-      <label className="text-xs text-muted-foreground">
-        {label}
-        {" "}
-        (px)
-      </label>
+      <label className="text-xs text-muted-foreground">{label} (px)</label>
       <Input
         type="number"
         min={0}
         className="h-7 text-xs"
         value={value}
-        onChange={e => onChange(Number(e.target.value) || 0)}
+        onChange={(e) => onChange(Number(e.target.value) || 0)}
       />
     </div>
   );

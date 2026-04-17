@@ -2,10 +2,7 @@ import { IconFolder } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  type Folder,
-  folderApi,
-} from "@/api/wiki/folder";
+import { type Folder, folderApi } from "@/api/wiki/folder";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -29,13 +26,11 @@ export function KbSidebar({ value, onChange, className }: KbSidebarProps) {
       if (all.length > 0 && !value) {
         onChange(all[0]!.id);
       }
-    }
-    catch {
+    } catch {
       toast.error("加载文件夹失败", {
         description: "获取文件夹列表失败",
       });
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -46,33 +41,29 @@ export function KbSidebar({ value, onChange, className }: KbSidebarProps) {
 
   return (
     <div className={cn("h-full overflow-auto pb-12", className)}>
-      {loading
-        ? (
-            <div className="flex items-center justify-center p-8">
-              <div className="text-sm text-muted-foreground">加载中...</div>
-            </div>
-          )
-        : folders.length === 0
-          ? (
-              <div className="flex items-center justify-center p-8">
-                <div className="text-sm text-muted-foreground">暂无文件夹</div>
-              </div>
-            )
-          : (
-              <div className="space-y-1 p-4">
-                {folders.map(folder => (
-                  <Button
-                    key={folder.id}
-                    variant={value === folder.id ? "default" : "ghost"}
-                    className="w-full justify-start"
-                    onClick={() => onChange(folder.id)}
-                  >
-                    <IconFolder className="mr-2 h-4 w-4" />
-                    {folder.name}
-                  </Button>
-                ))}
-              </div>
-            )}
+      {loading ? (
+        <div className="flex items-center justify-center p-8">
+          <div className="text-sm text-muted-foreground">加载中...</div>
+        </div>
+      ) : folders.length === 0 ? (
+        <div className="flex items-center justify-center p-8">
+          <div className="text-sm text-muted-foreground">暂无文件夹</div>
+        </div>
+      ) : (
+        <div className="space-y-1 p-4">
+          {folders.map((folder) => (
+            <Button
+              key={folder.id}
+              variant={value === folder.id ? "default" : "ghost"}
+              className="w-full justify-start"
+              onClick={() => onChange(folder.id)}
+            >
+              <IconFolder className="mr-2 h-4 w-4" />
+              {folder.name}
+            </Button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

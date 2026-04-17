@@ -41,9 +41,7 @@ export function DataTable({
       {
         accessorKey: "name",
         header: "角色名称",
-        cell: ({ row }) => (
-          <span className="font-medium">{row.original.name}</span>
-        ),
+        cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
       },
       {
         accessorKey: "description",
@@ -59,11 +57,7 @@ export function DataTable({
         header: "创建时间",
         cell: ({ row }) => {
           const date = new Date(row.original.created_at);
-          return (
-            <div className="text-muted-foreground">
-              {date.toLocaleDateString("zh-CN")}
-            </div>
-          );
+          return <div className="text-muted-foreground">{date.toLocaleDateString("zh-CN")}</div>;
         },
       },
       {
@@ -88,10 +82,7 @@ export function DataTable({
                   编辑
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() => onDelete?.(row.original)}
-                >
+                <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(row.original)}>
                   <IconTrash />
                   删除
                 </DropdownMenuItem>

@@ -52,9 +52,7 @@ export function AccountPage() {
                     <Icon className="h-5 w-5 mt-0.5 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm">{tab.title}</div>
-                      <div className="text-xs opacity-70 mt-1 line-clamp-2">
-                        {tab.description}
-                      </div>
+                      <div className="text-xs opacity-70 mt-1 line-clamp-2">{tab.description}</div>
                     </div>
                   </div>
                 );

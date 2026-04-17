@@ -66,8 +66,7 @@ const RESOURCE_PATH = "/api/wiki/folders";
 // 文件夹相关 API
 export const folderApi = {
   // 获取文件夹详情
-  findOne: (id: string) =>
-    request.get<Folder>(`${RESOURCE_PATH}/${id}`),
+  findOne: (id: string) => request.get<Folder>(`${RESOURCE_PATH}/${id}`),
 
   // 获取文件夹列表
   list: (parentId?: string) =>
@@ -76,8 +75,7 @@ export const folderApi = {
     }),
 
   // 获取文件夹树形结构
-  tree: () =>
-    request.get<FolderTreeNode[]>(`${RESOURCE_PATH}/tree`),
+  tree: () => request.get<FolderTreeNode[]>(`${RESOURCE_PATH}/tree`),
 
   // 获取文件夹列表（分页）
   page: (page = 1, pageSize = 10, parentId?: string) =>
@@ -86,20 +84,16 @@ export const folderApi = {
     }),
 
   // 创建文件夹
-  create: (data: CreateFolderRequest) =>
-    request.post<Folder>(RESOURCE_PATH, data),
+  create: (data: CreateFolderRequest) => request.post<Folder>(RESOURCE_PATH, data),
 
   // 更新文件夹
-  update: (data: UpdateFolderRequest) =>
-    request.put<Folder>(RESOURCE_PATH, data),
+  update: (data: UpdateFolderRequest) => request.put<Folder>(RESOURCE_PATH, data),
 
   // 删除文件夹
-  delete: (id: string) =>
-    request.delete(`${RESOURCE_PATH}/${id}`),
+  delete: (id: string) => request.delete(`${RESOURCE_PATH}/${id}`),
 
   // 获取文件夹权限
-  getPermissions: (id: string) =>
-    request.get<SelectedItem[]>(`${RESOURCE_PATH}/${id}/permissions`),
+  getPermissions: (id: string) => request.get<SelectedItem[]>(`${RESOURCE_PATH}/${id}/permissions`),
 
   // 设置文件夹权限
   setPermissions: (id: string, data: SetPermissionsRequest) =>

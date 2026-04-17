@@ -1,7 +1,13 @@
 import { IconFolder } from "@tabler/icons-react";
 
 import type { Folder } from "@/api/wiki/folder";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 import { FolderCard } from "./folder-card";
 
@@ -14,7 +20,14 @@ interface FolderGridProps {
   onEnter?: (folder: Folder) => void;
 }
 
-export function FolderGrid({ data, loading, onEdit, onDelete, onPermission, onEnter }: FolderGridProps) {
+export function FolderGrid({
+  data,
+  loading,
+  onEdit,
+  onDelete,
+  onPermission,
+  onEnter,
+}: FolderGridProps) {
   if (loading) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -41,7 +54,7 @@ export function FolderGrid({ data, loading, onEdit, onDelete, onPermission, onEn
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {data.map(folder => (
+      {data.map((folder) => (
         <FolderCard
           key={folder.id}
           folder={folder}

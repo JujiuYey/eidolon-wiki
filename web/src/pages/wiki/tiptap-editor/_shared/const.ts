@@ -157,7 +157,7 @@ const THEME_COLOR_COLUMNS = [
 
 // 主题色 - 参照截图整理成 6 x 10 的 Office/WPS 风格色板
 export const THEME_COLORS = THEME_COLOR_COLUMNS[0].values.flatMap((_, rowIndex) =>
-  THEME_COLOR_COLUMNS.map(column => ({
+  THEME_COLOR_COLUMNS.map((column) => ({
     label: `${column.label}-${rowIndex + 1}`,
     value: column.values[rowIndex],
   })),
@@ -199,6 +199,4 @@ export function parsePaperSize(value: string): PaperSize {
   return { width: w, height: h };
 }
 
-export const DEFAULT_PAPER_SIZE: PaperSize = parsePaperSize(
-  PAPER_SIZES[0].value,
-);
+export const DEFAULT_PAPER_SIZE: PaperSize = parsePaperSize(PAPER_SIZES[0].value);

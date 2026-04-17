@@ -84,19 +84,21 @@ export function EditorCatalog({ open, onToggle, editor }: EditorCatalogProps) {
       </div>
 
       <ScrollArea className="min-h-0 flex-1 overflow-auto px-2 py-3">
-        {items.length > 0
-          ? items.map(item => (
-              <button
-                key={item.id}
-                type="button"
-                className="flex w-full rounded-md px-2 py-1.5 text-left text-sm text-slate-700 transition hover:bg-slate-100"
-                style={{ paddingLeft: `${(item.level - 1) * 8}px` }}
-                onClick={() => editor?.chain?.().focus().setTextSelection(item.pos).run()}
-              >
-                {item.text}
-              </button>
-            ))
-          : <p className="px-2 text-xs text-slate-500">暂无目录</p>}
+        {items.length > 0 ? (
+          items.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className="flex w-full rounded-md px-2 py-1.5 text-left text-sm text-slate-700 transition hover:bg-slate-100"
+              style={{ paddingLeft: `${(item.level - 1) * 8}px` }}
+              onClick={() => editor?.chain?.().focus().setTextSelection(item.pos).run()}
+            >
+              {item.text}
+            </button>
+          ))
+        ) : (
+          <p className="px-2 text-xs text-slate-500">暂无目录</p>
+        )}
       </ScrollArea>
     </aside>
   );

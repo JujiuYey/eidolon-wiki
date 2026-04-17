@@ -31,14 +31,11 @@ export function formatTimestamp(timestamp: number | undefined): string {
   if (diffInHours < 1) {
     const diffInMinutes = Math.floor(diffInHours * 60);
     return diffInMinutes <= 1 ? "刚刚" : `${diffInMinutes}分钟前`;
-  }
-  else if (diffInHours < 24) {
+  } else if (diffInHours < 24) {
     return `${Math.floor(diffInHours)}小时前`;
-  }
-  else if (diffInHours < 24 * 7) {
+  } else if (diffInHours < 24 * 7) {
     return `${Math.floor(diffInHours / 24)}天前`;
-  }
-  else {
+  } else {
     return date.toLocaleDateString("zh-CN", {
       year: "numeric",
       month: "short",
@@ -87,7 +84,7 @@ export function generateConversationTitle(content: string | Message[]): string {
     return "新对话";
   }
 
-  const firstUserMessage = content.find(m => m.role === "user");
+  const firstUserMessage = content.find((m) => m.role === "user");
   if (!firstUserMessage) {
     return "新对话";
   }
@@ -104,8 +101,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
     return true;
-  }
-  catch {
+  } catch {
     toast.error("复制到剪贴板失败");
     // 降级方案
     try {
@@ -116,8 +112,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
       document.execCommand("copy");
       document.body.removeChild(textArea);
       return true;
-    }
-    catch {
+    } catch {
       toast.error("复制文本失败");
       return false;
     }
@@ -127,7 +122,11 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 /**
  * 下载文件
  */
-export function downloadFile(content: string, filename: string, contentType = "application/json"): void {
+export function downloadFile(
+  content: string,
+  filename: string,
+  contentType = "application/json",
+): void {
   const blob = new Blob([content], { type: contentType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");

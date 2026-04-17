@@ -36,27 +36,18 @@ export function Pagination({
 
   return (
     <div className="flex items-center justify-between px-4">
-      <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-        共
-        {" "}
-        {total}
-        {" "}
-        条
-      </div>
+      <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">共 {total} 条</div>
       <div className="flex w-full items-center gap-8 lg:w-fit">
         <div className="hidden items-center gap-2 lg:flex">
           <Label htmlFor="rows-per-page" className="text-sm font-medium">
             每页条数
           </Label>
-          <Select
-            value={`${pageSize}`}
-            onValueChange={value => onPageSizeChange(Number(value))}
-          >
+          <Select value={`${pageSize}`} onValueChange={(value) => onPageSizeChange(Number(value))}>
             <SelectTrigger size="sm" className="w-20" id="rows-per-page">
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {pageSizeOptions.map(size => (
+              {pageSizeOptions.map((size) => (
                 <SelectItem key={size} value={`${size}`}>
                   {size}
                 </SelectItem>
@@ -65,15 +56,7 @@ export function Pagination({
           </Select>
         </div>
         <div className="flex w-fit items-center justify-center text-sm font-medium">
-          第
-          {" "}
-          {page}
-          {" "}
-          页，共
-          {" "}
-          {totalPages}
-          {" "}
-          页
+          第 {page} 页，共 {totalPages} 页
         </div>
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
           <Button

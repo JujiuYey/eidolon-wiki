@@ -109,13 +109,11 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
         const totalTokens = history.reduce((acc, msg) => acc + (msg.usage?.total_tokens || 0), 0);
         setSessionTotalTokens(totalTokens);
         setTimeout(scrollToBottom, 50);
-      }
-      else {
+      } else {
         setMessages([WELCOME_MESSAGE]);
         setSessionTotalTokens(undefined);
       }
-    }
-    else {
+    } else {
       setMessages([WELCOME_MESSAGE]);
       setSessionTotalTokens(undefined);
     }
@@ -137,7 +135,7 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
     scrollToBottom();
@@ -173,7 +171,7 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
     };
 
     // 添加空的 AI 消息
-    setMessages(prev => [...prev, assistantMessage]);
+    setMessages((prev) => [...prev, assistantMessage]);
     currentAssistantMessageRef.current = assistantMessageId;
 
     try {
@@ -187,25 +185,27 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
           // 处理流式事件
           if (event.type === "stream_chunk" && event.content) {
             // 流式内容更新
-            setMessages(prev => prev.map((msg) => {
-              if (msg.id === assistantMessageId) {
-                return { ...msg, content: msg.content + event.content! };
-              }
-              return msg;
-            }));
+            setMessages((prev) =>
+              prev.map((msg) => {
+                if (msg.id === assistantMessageId) {
+                  return { ...msg, content: msg.content + event.content! };
+                }
+                return msg;
+              }),
+            );
             scrollToBottom();
-          }
-          else if (event.type === "tool_result_chunk" && event.content) {
+          } else if (event.type === "tool_result_chunk" && event.content) {
             // 工具调用结果（如 RAG 检索到的 chunk）
-            setMessages(prev => prev.map((msg) => {
-              if (msg.id === assistantMessageId) {
-                return { ...msg, content: msg.content + `\n[工具结果] ${event.content}` };
-              }
-              return msg;
-            }));
+            setMessages((prev) =>
+              prev.map((msg) => {
+                if (msg.id === assistantMessageId) {
+                  return { ...msg, content: msg.content + `\n[工具结果] ${event.content}` };
+                }
+                return msg;
+              }),
+            );
             scrollToBottom();
-          }
-          else if (event.type === "error" && event.content) {
+          } else if (event.type === "error" && event.content) {
             // 错误消息
             toast.error(event.content);
           }
@@ -215,7 +215,7 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
           setIsLoading(false);
           // 保存 AI 回复到会话历史
           setMessages((prev) => {
-            const aiMsg = prev.find(m => m.id === assistantMessageId);
+            const aiMsg = prev.find((m) => m.id === assistantMessageId);
             if (aiMsg) {
               mockRagSessions[newSessionId].push({
                 id: aiMsg.id,
@@ -232,15 +232,14 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
           setIsLoading(false);
           toast.error(`请求失败: ${error.message}`);
           // 移除失败的 AI 消息
-          setMessages(prev => prev.filter(m => m.id !== assistantMessageId));
+          setMessages((prev) => prev.filter((m) => m.id !== assistantMessageId));
           mockRagSessions[newSessionId] = mockRagSessions[newSessionId].filter(
-            m => m.id !== userMessage.id,
+            (m) => m.id !== userMessage.id,
           );
         },
       );
-    }
-    catch {
-      setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+    } catch {
+      setMessages((prev) => prev.filter((m) => m.id !== userMessage.id));
       setIsLoading(false);
       toast.error("发送消息失败");
     }
@@ -265,20 +264,15 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
     <div className="h-full flex flex-col bg-background">
       {/* Messages area */}
       <div ref={scrollRef} className="flex-1 overflow-auto p-6 space-y-6">
-        {messages.map(message => (
+        {messages.map((message) => (
           <div
             key={message.id}
-            className={cn(
-              "flex",
-              message.role === "user" ? "justify-end" : "justify-start",
-            )}
+            className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}
           >
             <div
               className={cn(
                 "max-w-[80%] rounded-lg px-4 py-3 text-sm",
-                message.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted",
+                message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted",
               )}
             >
               {/* Message content */}
@@ -295,21 +289,13 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
                         className="text-xs p-2 rounded bg-background/50"
                       >
                         <div className="font-medium">
-                          {index + 1}
-                          .
-                          {chunk.filename}
+                          {index + 1}.{chunk.filename}
                         </div>
                         <div className="text-muted-foreground mt-1 line-clamp-2">
                           {chunk.content}
                         </div>
                         <div className="text-muted-foreground mt-1 text-[10px]">
-                          Chunk ID:
-                          {" "}
-                          {chunk.chunk_id}
-                          {" "}
-                          | Document:
-                          {" "}
-                          {chunk.document_id.slice(0, 8)}
+                          Chunk ID: {chunk.chunk_id} | Document: {chunk.document_id.slice(0, 8)}
                           ...
                         </div>
                       </div>
@@ -361,8 +347,7 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
           <div className="max-w-4xl mx-auto flex items-center justify-between text-xs">
             <div className="flex items-center gap-4 text-muted-foreground">
               <span>
-                会话 Token 消耗:
-                {" "}
+                会话 Token 消耗:{" "}
                 <strong className="text-foreground">{formatTokenCount(sessionTotalTokens)}</strong>
               </span>
               <span>
@@ -375,11 +360,12 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
                 <span>Token 已超出上下文限制，建议开启新一轮对话</span>
               </div>
             )}
-            {sessionTotalTokens >= CONTEXT_WARNING_THRESHOLD && sessionTotalTokens < CONTEXT_LIMIT && (
-              <div className="flex items-center gap-2 text-orange-500 font-medium">
-                <span>Token 消耗较高，建议开启新一轮对话</span>
-              </div>
-            )}
+            {sessionTotalTokens >= CONTEXT_WARNING_THRESHOLD &&
+              sessionTotalTokens < CONTEXT_LIMIT && (
+                <div className="flex items-center gap-2 text-orange-500 font-medium">
+                  <span>Token 消耗较高，建议开启新一轮对话</span>
+                </div>
+              )}
           </div>
         </div>
       )}
@@ -398,14 +384,12 @@ export function ChatPanel({ sessionId, folderId, onSessionCreated }: ChatPanelPr
               rows={1}
               disabled={isLoading}
             />
-            <Button
-              size="icon"
-              onClick={handleSubmit}
-              disabled={isLoading || !inputValue.trim()}
-            >
-              {isLoading
-                ? <IconLoader2 className="h-4 w-4 animate-spin" />
-                : <IconSend className="h-4 w-4" />}
+            <Button size="icon" onClick={handleSubmit} disabled={isLoading || !inputValue.trim()}>
+              {isLoading ? (
+                <IconLoader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <IconSend className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>

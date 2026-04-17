@@ -56,9 +56,7 @@ export function FolderDetailPanel({ folder, onEdit }: FolderDetailPanelProps) {
         <div className="flex items-center gap-2">
           {folder.created_by && (
             <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs">
-                {folder.created_by.slice(0, 1)}
-              </AvatarFallback>
+              <AvatarFallback className="text-xs">{folder.created_by.slice(0, 1)}</AvatarFallback>
             </Avatar>
           )}
         </div>
@@ -69,9 +67,7 @@ export function FolderDetailPanel({ folder, onEdit }: FolderDetailPanelProps) {
       {/* 描述 */}
       <div>
         <span className="text-sm text-muted-foreground">描述</span>
-        <p className="mt-1 text-sm font-medium">
-          {folder.description || "暂无描述"}
-        </p>
+        <p className="mt-1 text-sm font-medium">{folder.description || "暂无描述"}</p>
       </div>
 
       <Separator />

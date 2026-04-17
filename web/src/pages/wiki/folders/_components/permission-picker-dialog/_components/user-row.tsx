@@ -15,12 +15,7 @@ interface UserRowProps {
   subtitle?: string;
 }
 
-export function UserRow({
-  user,
-  checked,
-  onCheck,
-  subtitle,
-}: UserRowProps) {
+export function UserRow({ user, checked, onCheck, subtitle }: UserRowProps) {
   return (
     <div className="flex items-center gap-2 px-2 py-2 hover:bg-accent rounded-md">
       <Checkbox checked={checked} onCheckedChange={onCheck} />
@@ -29,9 +24,7 @@ export function UserRow({
       </div>
       <div className="flex flex-col min-w-0">
         <span className="text-sm">{user.name}</span>
-        {subtitle && (
-          <span className="text-xs text-muted-foreground truncate">{subtitle}</span>
-        )}
+        {subtitle && <span className="text-xs text-muted-foreground truncate">{subtitle}</span>}
       </div>
     </div>
   );

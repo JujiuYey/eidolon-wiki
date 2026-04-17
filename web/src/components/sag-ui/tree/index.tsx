@@ -33,7 +33,9 @@ function TreeNodeComponent<T extends TreeNode<T>>({
 }: TreeNodeComponentProps<T>) {
   const isExpanded = expandedIds.has(node.id);
   const isSelected = selectedId === node.id;
-  const nodeHasChildren = hasChildren ? hasChildren(node) : (node.children && node.children.length > 0);
+  const nodeHasChildren = hasChildren
+    ? hasChildren(node)
+    : node.children && node.children.length > 0;
 
   const handleClick = () => {
     onSelect(node);
@@ -55,21 +57,19 @@ function TreeNodeComponent<T extends TreeNode<T>>({
         style={{ paddingLeft: `${level * 16 + 8}px` }}
         onClick={handleClick}
       >
-        {nodeHasChildren
-          ? (
-              <button
-                onClick={handleToggle}
-                className={cn(
-                  "p-0 border-none bg-transparent shrink-0 transition-transform",
-                  isExpanded && "rotate-90",
-                )}
-              >
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </button>
-            )
-          : (
-              <span className="size-4 shrink-0" />
+        {nodeHasChildren ? (
+          <button
+            onClick={handleToggle}
+            className={cn(
+              "p-0 border-none bg-transparent shrink-0 transition-transform",
+              isExpanded && "rotate-90",
             )}
+          >
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </button>
+        ) : (
+          <span className="size-4 shrink-0" />
+        )}
 
         <div className="flex items-center gap-2 flex-1">
           {renderNode(node, isExpanded, isSelected)}
@@ -78,7 +78,7 @@ function TreeNodeComponent<T extends TreeNode<T>>({
 
       <Collapsible open={isExpanded}>
         <CollapsibleContent>
-          {node.children?.map(child => (
+          {node.children?.map((child) => (
             <TreeNodeComponent
               key={child.id}
               node={child}
@@ -148,12 +148,11 @@ export function Tree<T extends TreeNode<T>>({
   }, [defaultExpandedAll, data]);
 
   const handleToggleExpand = useCallback((node: T) => {
-    setExpandedIds(prev => {
+    setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(node.id)) {
         next.delete(node.id);
-      }
-      else {
+      } else {
         next.add(node.id);
       }
       return next;
@@ -180,27 +179,25 @@ export function Tree<T extends TreeNode<T>>({
         </div>
       )}
 
-      {loading
-        ? (
-            <div className="flex items-center justify-center py-4">
-              <span className="text-sm text-muted-foreground">加载中...</span>
-            </div>
-          )
-        : (
-            data.map(node => (
-              <TreeNodeComponent
-                key={node.id}
-                node={node}
-                level={0}
-                selectedId={selectedId}
-                expandedIds={expandedIds}
-                onSelect={onSelect}
-                onToggleExpand={handleToggleExpand}
-                renderNode={renderNode}
-                hasChildren={hasChildren}
-              />
-            ))
-          )}
+      {loading ? (
+        <div className="flex items-center justify-center py-4">
+          <span className="text-sm text-muted-foreground">加载中...</span>
+        </div>
+      ) : (
+        data.map((node) => (
+          <TreeNodeComponent
+            key={node.id}
+            node={node}
+            level={0}
+            selectedId={selectedId}
+            expandedIds={expandedIds}
+            onSelect={onSelect}
+            onToggleExpand={handleToggleExpand}
+            renderNode={renderNode}
+            hasChildren={hasChildren}
+          />
+        ))
+      )}
     </div>
   );
 }

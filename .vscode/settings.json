@@ -1,0 +1,64 @@
+{
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
+  "oxc.configPath": "web/.oxlintrc.json",
+  "oxc.fmt.configPath": "web/.oxfmtrc.json",
+  "oxc.path.oxlint": "web/node_modules/.bin/oxlint",
+  "oxc.path.oxfmt": "web/node_modules/.bin/oxfmt",
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true
+  },
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "stylelint.validate": ["css"],
+  "cSpell.words": [
+    "arkruntime",
+    "asynq",
+    "axios",
+    "bundebug",
+    "bytedance",
+    "chenzhuoyu",
+    "cpuid",
+    "doubao",
+    "Eino",
+    "fatih",
+    "goccy",
+    "godotenv",
+    "gonic",
+    "gopkg",
+    "isatty",
+    "lucide",
+    "notnull",
+    "nullzero",
+    "pgdialect",
+    "pgdriver",
+    "plpgsql",
+    "qdrant",
+    "Remirror",
+    "sonner",
+    "sqldb",
+    "tabler",
+    "tanstack",
+    "uptrace",
+    "varchar",
+    "volc",
+    "volcengine"
+  ]
+}

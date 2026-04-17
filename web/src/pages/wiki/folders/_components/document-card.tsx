@@ -1,7 +1,4 @@
-import {
-  IconDotsVertical,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -47,12 +44,10 @@ export function DocumentCard({ document, onDelete, onOpen }: DocumentCardProps) 
       const res = await documentApi.download(document.id);
       // 打开下载链接
       window.open(res.download_url, "_blank");
-    }
-    catch (error) {
+    } catch (error) {
       toast.error("下载失败");
       console.error("下载失败:", error);
-    }
-    finally {
+    } finally {
       setDownloading(false);
       setMenuOpen(false);
     }
@@ -71,11 +66,7 @@ export function DocumentCard({ document, onDelete, onOpen }: DocumentCardProps) 
     >
       <div className="flex items-center gap-3 pr-9">
         <div className="rounded-lg bg-muted p-2">
-          <img
-            src={iconAsset.src}
-            alt={iconAsset.alt}
-            className="h-6 w-6 object-contain"
-          />
+          <img src={iconAsset.src} alt={iconAsset.alt} className="h-6 w-6 object-contain" />
         </div>
         <div className="min-w-0 flex-1">
           <h3
@@ -102,10 +93,7 @@ export function DocumentCard({ document, onDelete, onOpen }: DocumentCardProps) 
             {downloading ? "下载中..." : "下载"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={handleDelete}
-            className="text-destructive"
-          >
+          <DropdownMenuItem onClick={handleDelete} className="text-destructive">
             <IconTrash className="mr-2 h-4 w-4" />
             删除
           </DropdownMenuItem>

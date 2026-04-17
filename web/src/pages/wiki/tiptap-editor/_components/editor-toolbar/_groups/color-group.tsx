@@ -14,21 +14,17 @@ export function ColorGroup() {
       <ColorPickerPopover
         color={rangeStyle.textColor}
         colors={TEXT_COLORS}
-        onChange={color => editor?.chain().focus().setColor(color).run()}
+        onChange={(color) => editor?.chain().focus().setColor(color).run()}
       >
         <div>
-          <ToolbarButton
-            icon={<Type className="h-4 w-4" />}
-            title="文字颜色"
-            disabled={!editor}
-          />
+          <ToolbarButton icon={<Type className="h-4 w-4" />} title="文字颜色" disabled={!editor} />
         </div>
       </ColorPickerPopover>
 
       <ColorPickerPopover
         color={rangeStyle.highlight}
         colors={HIGHLIGHT_COLORS}
-        onChange={color => editor?.chain().focus().toggleHighlight({ color }).run()}
+        onChange={(color) => editor?.chain().focus().toggleHighlight({ color }).run()}
       >
         <div>
           <ToolbarButton

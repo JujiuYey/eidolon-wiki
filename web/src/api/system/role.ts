@@ -33,8 +33,7 @@ const RESOURCE_PATH = "/api/system/role";
 // 角色相关 API
 export const roleApi = {
   // 获取角色详情
-  findOne: (id: string) =>
-    request.get<Role>(`${RESOURCE_PATH}/${id}`),
+  findOne: (id: string) => request.get<Role>(`${RESOURCE_PATH}/${id}`),
 
   // 获取角色列表
   page: (page = 1, pageSize = 10) =>
@@ -43,14 +42,11 @@ export const roleApi = {
     }),
 
   // 创建角色
-  create: (data: CreateRoleRequest) =>
-    request.post<Role>(RESOURCE_PATH, data),
+  create: (data: CreateRoleRequest) => request.post<Role>(RESOURCE_PATH, data),
 
   // 更新角色
-  update: (data: UpdateRoleRequest) =>
-    request.put<Role>(`${RESOURCE_PATH}`, data),
+  update: (data: UpdateRoleRequest) => request.put<Role>(`${RESOURCE_PATH}`, data),
 
   // 删除角色
-  delete: (id: string) =>
-    request.delete(`${RESOURCE_PATH}/${id}`),
+  delete: (id: string) => request.delete(`${RESOURCE_PATH}/${id}`),
 };

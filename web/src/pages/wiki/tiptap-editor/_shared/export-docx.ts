@@ -1,11 +1,7 @@
 import type { Editor } from "@tiptap/react";
 import { Packer, ShadingType } from "docx";
 import { saveAs } from "file-saver";
-import {
-  defaultMarks,
-  defaultNodes,
-  DocxSerializer,
-} from "prosemirror-docx";
+import { defaultMarks, defaultNodes, DocxSerializer } from "prosemirror-docx";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

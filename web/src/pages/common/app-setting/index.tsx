@@ -45,9 +45,7 @@ export function AppSettingPage() {
                     <Icon className="h-5 w-5 mt-0.5 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm">{tab.title}</div>
-                      <div className="text-xs opacity-70 mt-1 line-clamp-2">
-                        {tab.description}
-                      </div>
+                      <div className="text-xs opacity-70 mt-1 line-clamp-2">{tab.description}</div>
                     </div>
                   </div>
                 );
@@ -58,9 +56,7 @@ export function AppSettingPage() {
 
         {/* 右侧配置内容 */}
         <div className="flex-1 min-w-0">
-          <div className="space-y-6">
-            {activeTab === "app" && <AppConfig />}
-          </div>
+          <div className="space-y-6">{activeTab === "app" && <AppConfig />}</div>
         </div>
       </div>
     </div>

@@ -47,12 +47,7 @@ const documentItem: Document = {
 describe("folder icon surfaces", () => {
   it("renders the folder svg asset in folder cards", () => {
     render(
-      <FolderCard
-        folder={folder}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-        onPermission={vi.fn()}
-      />,
+      <FolderCard folder={folder} onEdit={vi.fn()} onDelete={vi.fn()} onPermission={vi.fn()} />,
     );
 
     const image = screen.getByRole("img", { name: "文件夹图标" }) as HTMLImageElement;

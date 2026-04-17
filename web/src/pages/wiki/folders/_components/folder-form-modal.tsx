@@ -53,8 +53,7 @@ export function FolderFormModal({
           description: value.description || undefined,
           parent_id: value.parent_id || undefined,
         });
-      }
-      else {
+      } else {
         onSubmit({
           id: folder!.id,
           name: value.name,
@@ -94,23 +93,18 @@ export function FolderFormModal({
           className="flex flex-col gap-4"
         >
           <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-            <form.Field
-              name="name"
-              validators={{ onChange: folderFormSchema.shape.name }}
-            >
-              {field => (
+            <form.Field name="name" validators={{ onChange: folderFormSchema.shape.name }}>
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="name">
-                    文件夹名称
-                    {" "}
-                    <span className="text-destructive">*</span>
+                    文件夹名称 <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="name"
                     placeholder="请输入文件夹名称"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={e => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs">
@@ -125,7 +119,7 @@ export function FolderFormModal({
               name="description"
               validators={{ onChange: folderFormSchema.shape.description }}
             >
-              {field => (
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="description">描述</Label>
                   <Input
@@ -133,7 +127,7 @@ export function FolderFormModal({
                     placeholder="请输入文件夹描述（可选）"
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
-                    onChange={e => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs">
@@ -149,11 +143,7 @@ export function FolderFormModal({
               取消
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading
-                ? "保存中..."
-                : mode === "create"
-                  ? "创建"
-                  : "保存"}
+              {loading ? "保存中..." : mode === "create" ? "创建" : "保存"}
             </Button>
           </DialogFooter>
         </form>

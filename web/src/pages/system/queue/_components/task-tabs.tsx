@@ -1,10 +1,5 @@
 import type { TaskInfo } from "@/api/system/queue";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { TaskTable } from "./task-table";
 
@@ -41,19 +36,16 @@ export function TaskTabs({
   onPageSizeChange,
 }: TaskTabsProps) {
   return (
-    <Tabs
-      value={currentState}
-      onValueChange={value => onStateChange(value)}
-    >
+    <Tabs value={currentState} onValueChange={(value) => onStateChange(value)}>
       <TabsList className="grid w-full grid-cols-6">
-        {states.map(s => (
+        {states.map((s) => (
           <TabsTrigger key={s.value} value={s.value}>
             {s.label}
           </TabsTrigger>
         ))}
       </TabsList>
 
-      {states.map(s => (
+      {states.map((s) => (
         <TabsContent key={s.value} value={s.value} className="mt-4">
           <TaskTable
             tasks={tasks}

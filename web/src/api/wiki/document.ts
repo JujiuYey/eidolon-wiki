@@ -107,16 +107,14 @@ export const documentApi = {
     request.get<Document[]>(`${RESOURCE_PATH}/list`, { params }),
 
   // 获取文档详情
-  findOne: (id: string) =>
-    request.get<Document>(`${RESOURCE_PATH}/${id}`),
+  findOne: (id: string) => request.get<Document>(`${RESOURCE_PATH}/${id}`),
 
   // 下载文档
   download: (id: string) =>
     request.get<DocumentDownloadResponse>(`${RESOURCE_PATH}/${id}/download`),
 
   // 删除文档
-  delete: (id: string) =>
-    request.delete<{ message: string }>(`${RESOURCE_PATH}/${id}`),
+  delete: (id: string) => request.delete<{ message: string }>(`${RESOURCE_PATH}/${id}`),
 
   // 处理文档（向量化）
   process: (id: string) =>
@@ -131,8 +129,7 @@ export const documentApi = {
     request.put<{ message: string }>(`${RESOURCE_PATH}/${id}/content`, data),
 
   // 获取文档 chunks
-  getChunks: (id: string) =>
-    request.get<ChunksResponse>(`${RESOURCE_PATH}/${id}/chunks`),
+  getChunks: (id: string) => request.get<ChunksResponse>(`${RESOURCE_PATH}/${id}/chunks`),
 
   // 删除文档 chunks
   deleteChunks: (id: string) =>

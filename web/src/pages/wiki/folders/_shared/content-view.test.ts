@@ -34,15 +34,12 @@ describe("getFolderContentView", () => {
         baseFolder,
         { ...baseFolder, id: "folder-2", name: "开发文档", description: "工程说明" },
       ],
-      documents: [
-        baseDocument,
-        { ...baseDocument, id: "doc-2", filename: "hr-database.md" },
-      ],
+      documents: [baseDocument, { ...baseDocument, id: "doc-2", filename: "hr-database.md" }],
       searchKeyword: "产品",
     });
 
-    expect(view.folders.map(folder => folder.id)).toEqual(["folder-1"]);
-    expect(view.documents.map(document => document.id)).toEqual(["doc-1"]);
+    expect(view.folders.map((folder) => folder.id)).toEqual(["folder-1"]);
+    expect(view.documents.map((document) => document.id)).toEqual(["doc-1"]);
     expect(view.counts).toEqual({
       all: 2,
       folders: 1,

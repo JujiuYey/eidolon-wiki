@@ -1,8 +1,4 @@
-import {
-  IconDeviceFloppy,
-  IconRotate,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconDeviceFloppy, IconRotate, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -35,9 +31,9 @@ import { Switch } from "@/components/ui/switch";
 import { useAppStore } from "@/stores/app";
 
 export function AppConfig() {
-  const settings = useAppStore(s => s.settings);
-  const updateSettings = useAppStore(s => s.updateSettings);
-  const resetSettings = useAppStore(s => s.resetSettings);
+  const settings = useAppStore((s) => s.settings);
+  const updateSettings = useAppStore((s) => s.updateSettings);
+  const resetSettings = useAppStore((s) => s.resetSettings);
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
@@ -67,13 +63,11 @@ export function AppConfig() {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label>自动保存对话</Label>
-            <p className="text-sm text-muted-foreground">
-              自动保存对话历史到本地存储
-            </p>
+            <p className="text-sm text-muted-foreground">自动保存对话历史到本地存储</p>
           </div>
           <Switch
             checked={settings.autoSave}
-            onCheckedChange={checked => updateSettings({ autoSave: checked })}
+            onCheckedChange={(checked) => updateSettings({ autoSave: checked })}
           />
         </div>
 
@@ -83,15 +77,9 @@ export function AppConfig() {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label>清除数据</Label>
-            <p className="text-sm text-muted-foreground">
-              删除所有对话记录，此操作不可撤销
-            </p>
+            <p className="text-sm text-muted-foreground">删除所有对话记录，此操作不可撤销</p>
           </div>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setShowClearConfirm(true)}
-          >
+          <Button variant="destructive" size="sm" onClick={() => setShowClearConfirm(true)}>
             <IconTrash className="mr-2 h-4 w-4" />
             清除所有对话
           </Button>
@@ -103,14 +91,11 @@ export function AppConfig() {
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label>主题设置</Label>
-            <p className="text-sm text-muted-foreground">
-              选择应用主题外观
-            </p>
+            <p className="text-sm text-muted-foreground">选择应用主题外观</p>
           </div>
           <Select
             value={settings.theme}
-            onValueChange={(value: "system" | "light" | "dark") =>
-              updateSettings({ theme: value })}
+            onValueChange={(value: "system" | "light" | "dark") => updateSettings({ theme: value })}
           >
             <SelectTrigger className="w-32">
               <SelectValue />
@@ -145,16 +130,10 @@ export function AppConfig() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2 pt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowClearConfirm(false)}
-            >
+            <Button variant="outline" onClick={() => setShowClearConfirm(false)}>
               取消
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleClearAllConversations}
-            >
+            <Button variant="destructive" onClick={handleClearAllConversations}>
               <IconTrash className="mr-2 h-4 w-4" />
               确认清除
             </Button>

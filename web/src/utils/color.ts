@@ -6,7 +6,7 @@ export interface RgbDraft {
 
 function rgbChannelsToHex(channels: number[]) {
   return `#${channels
-    .map(channel => channel.toString(16).padStart(2, "0").toUpperCase())
+    .map((channel) => channel.toString(16).padStart(2, "0").toUpperCase())
     .join("")}`;
 }
 
@@ -24,12 +24,12 @@ export function normalizeHexColor(value: string) {
       .filter(Boolean)
       .slice(0, 3);
 
-    if (channels.length !== 3 || !channels.every(channel => /^\d{1,3}$/.test(channel))) {
+    if (channels.length !== 3 || !channels.every((channel) => /^\d{1,3}$/.test(channel))) {
       return null;
     }
 
     const numericChannels = channels.map(Number);
-    if (!numericChannels.every(channel => channel >= 0 && channel <= 255)) {
+    if (!numericChannels.every((channel) => channel >= 0 && channel <= 255)) {
       return null;
     }
 
@@ -39,7 +39,10 @@ export function normalizeHexColor(value: string) {
 }
 
 export function sanitizeHexInput(value: string) {
-  const hex = value.replace(/[^0-9A-Fa-f]/g, "").slice(0, 6).toUpperCase();
+  const hex = value
+    .replace(/[^0-9A-Fa-f]/g, "")
+    .slice(0, 6)
+    .toUpperCase();
   return hex ? `#${hex}` : "";
 }
 
@@ -71,7 +74,7 @@ export function rgbDraftToHex(value: RgbDraft) {
     return null;
   }
 
-  return rgbChannelsToHex(channels.map(channel => Number(channel)));
+  return rgbChannelsToHex(channels.map((channel) => Number(channel)));
 }
 
 export function isLightColor(value: string) {
@@ -80,5 +83,5 @@ export function isLightColor(value: string) {
     return false;
   }
 
-  return [rgb.r, rgb.g, rgb.b].every(channel => Number(channel) >= 235);
+  return [rgb.r, rgb.g, rgb.b].every((channel) => Number(channel) >= 235);
 }

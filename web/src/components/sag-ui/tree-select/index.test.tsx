@@ -35,13 +35,7 @@ const items: TreeSelectItem<TestNode>[] = [
 
 describe("TreeSelect", () => {
   it("shows tree items after opening the select", () => {
-    render(
-      <TreeSelect
-        items={items}
-        onValueChange={vi.fn()}
-        placeholder="请选择部门"
-      />,
-    );
+    render(<TreeSelect items={items} onValueChange={vi.fn()} placeholder="请选择部门" />);
 
     fireEvent.click(screen.getByRole("combobox"));
 
@@ -49,13 +43,7 @@ describe("TreeSelect", () => {
   });
 
   it("closes the list after selecting an item", () => {
-    render(
-      <TreeSelect
-        items={items}
-        onValueChange={vi.fn()}
-        placeholder="请选择部门"
-      />,
-    );
+    render(<TreeSelect items={items} onValueChange={vi.fn()} placeholder="请选择部门" />);
 
     const trigger = screen.getByRole("combobox");
 

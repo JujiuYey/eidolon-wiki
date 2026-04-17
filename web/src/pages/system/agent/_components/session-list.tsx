@@ -44,7 +44,7 @@ export function SessionList({ items, selectedSession, onSelect, loading }: Sessi
   return (
     <div className="flex-1 overflow-y-auto p-4 pt-0">
       <div className="flex flex-col gap-2">
-        {items.map(item => (
+        {items.map((item) => (
           <button
             key={item.id}
             className={cn(
@@ -56,16 +56,12 @@ export function SessionList({ items, selectedSession, onSelect, loading }: Sessi
             <div className="flex w-full flex-col gap-1">
               <div className="flex items-center">
                 <div className="flex items-center gap-2">
-                  <div className="font-semibold">
-                    {item.title || "未命名对话"}
-                  </div>
+                  <div className="font-semibold">{item.title || "未命名对话"}</div>
                 </div>
                 <div
                   className={cn(
                     "ml-auto text-xs",
-                    selectedSession === item.id
-                      ? "text-foreground"
-                      : "text-muted-foreground",
+                    selectedSession === item.id ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   {formatRelativeTime(item.updated_at)}
@@ -73,16 +69,12 @@ export function SessionList({ items, selectedSession, onSelect, loading }: Sessi
               </div>
             </div>
             <div className="line-clamp-2 text-xs text-muted-foreground">
-              {item.message_count}
-              {" "}
-              条消息
+              {item.message_count} 条消息
             </div>
           </button>
         ))}
         {items.length === 0 && (
-          <div className="py-8 text-center text-sm text-muted-foreground">
-            暂无对话记录
-          </div>
+          <div className="py-8 text-center text-sm text-muted-foreground">暂无对话记录</div>
         )}
       </div>
     </div>

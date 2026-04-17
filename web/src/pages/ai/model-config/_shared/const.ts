@@ -6,7 +6,7 @@ export const MODEL_TYPES = [
   { id: "embedding", name: "向量模型", description: "用于生成文本向量嵌入" },
 ] as const;
 
-export type ModelTypeId = typeof MODEL_TYPES[number]["id"];
+export type ModelTypeId = (typeof MODEL_TYPES)[number]["id"];
 
 // Chat 模型供应商配置
 export const CHAT_PROVIDERS = [

@@ -33,17 +33,13 @@ const RESOURCE_PATH = "/api/ai/collections";
 
 // API 函数
 const api = {
-  list: () =>
-    request.get<Collection[]>(RESOURCE_PATH),
+  list: () => request.get<Collection[]>(RESOURCE_PATH),
 
-  get: (name: string) =>
-    request.get<Collection>(`${RESOURCE_PATH}/${name}`),
+  get: (name: string) => request.get<Collection>(`${RESOURCE_PATH}/${name}`),
 
-  create: (data: CreateCollectionRequest) =>
-    request.post(RESOURCE_PATH, data),
+  create: (data: CreateCollectionRequest) => request.post(RESOURCE_PATH, data),
 
-  delete: (name: string) =>
-    request.delete(`${RESOURCE_PATH}/${name}`),
+  delete: (name: string) => request.delete(`${RESOURCE_PATH}/${name}`),
 
   getPoints: (name: string, limit?: number) =>
     request.get<{ points: Point[] }>(`${RESOURCE_PATH}/${name}/points?limit=${limit || 20}`),
@@ -65,7 +61,7 @@ export const collectionKeys = {
 export function useCollectionList() {
   return useQuery({
     queryKey: collectionKeys.list(),
-    queryFn: () => api.list().then(res => res || []),
+    queryFn: () => api.list().then((res) => res || []),
   });
 }
 

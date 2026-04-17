@@ -60,23 +60,17 @@ const RESOURCE_PATH = "/api/ai/model-config";
 
 // API 函数
 const api = {
-  findOne: (id: string) =>
-    request.get<ModelConfig>(`${RESOURCE_PATH}/${id}`),
+  findOne: (id: string) => request.get<ModelConfig>(`${RESOURCE_PATH}/${id}`),
 
-  list: () =>
-    request.get<ModelConfig[]>(`${RESOURCE_PATH}/list`),
+  list: () => request.get<ModelConfig[]>(`${RESOURCE_PATH}/list`),
 
-  create: (data: CreateModelConfigRequest) =>
-    request.post<ModelConfig>(RESOURCE_PATH, data),
+  create: (data: CreateModelConfigRequest) => request.post<ModelConfig>(RESOURCE_PATH, data),
 
-  update: (data: UpdateModelConfigRequest) =>
-    request.put<ModelConfig>(RESOURCE_PATH, data),
+  update: (data: UpdateModelConfigRequest) => request.put<ModelConfig>(RESOURCE_PATH, data),
 
-  delete: (id: string) =>
-    request.delete(`${RESOURCE_PATH}/${id}`),
+  delete: (id: string) => request.delete(`${RESOURCE_PATH}/${id}`),
 
-  setDefault: (id: string) =>
-    request.post(`${RESOURCE_PATH}/${id}/default`),
+  setDefault: (id: string) => request.post(`${RESOURCE_PATH}/${id}/default`),
 };
 
 // Query keys
@@ -92,7 +86,7 @@ export const modelConfigKeys = {
 export function useModelConfigList() {
   return useQuery({
     queryKey: modelConfigKeys.list(),
-    queryFn: () => api.list().then(res => res || []),
+    queryFn: () => api.list().then((res) => res || []),
   });
 }
 
@@ -134,11 +128,7 @@ export function useUpdateModelConfig() {
       toast.success("保存成功");
       // 更新列表缓存
       queryClient.setQueryData<ModelConfig[]>(modelConfigKeys.list(), (old) => {
-        return old
-          ? old.map(config =>
-              config.id === result.id ? result : config,
-            )
-          : [result];
+        return old ? old.map((config) => (config.id === result.id ? result : config)) : [result];
       });
     },
     onError: () => {
@@ -160,7 +150,7 @@ export function useDeleteModelConfig() {
       const previousData = queryClient.getQueryData<ModelConfig[]>(modelConfigKeys.list());
 
       queryClient.setQueryData<ModelConfig[]>(modelConfigKeys.list(), (old) => {
-        return old ? old.filter(config => config.id !== deletedId) : [];
+        return old ? old.filter((config) => config.id !== deletedId) : [];
       });
 
       return { previousData };

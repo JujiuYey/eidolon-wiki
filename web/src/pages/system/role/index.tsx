@@ -40,11 +40,9 @@ export function RolePage() {
       const res = await roleApi.page(page, pageSize);
       setData(res.data || []);
       setTotal(res.total || 0);
-    }
-    catch (error) {
+    } catch (error) {
       toast.error(`加载角色列表失败，${error}`);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   }, [page, pageSize]);
@@ -79,8 +77,7 @@ export function RolePage() {
       await roleApi.delete(deleteTarget.id);
       toast.success("删除成功");
       loadRoles();
-    }
-    catch (error) {
+    } catch (error) {
       toast.error(`删除失败，${error}`);
     }
   };
@@ -92,19 +89,16 @@ export function RolePage() {
       if (formMode === "create") {
         await roleApi.create(formData as CreateRoleRequest);
         toast.success("创建成功");
-      }
-      else {
+      } else {
         await roleApi.update(formData as UpdateRoleRequest);
         toast.success("更新成功");
       }
       setFormOpen(false);
       loadRoles();
-    }
-    catch (error) {
+    } catch (error) {
       console.error("保存角色失败:", error);
       toast.error(formMode === "create" ? "创建失败" : "更新失败");
-    }
-    finally {
+    } finally {
       setSubmitting(false);
     }
   };
@@ -117,9 +111,10 @@ export function RolePage() {
 
   // 过滤数据（前端搜索）
   const filteredData = searchKeyword
-    ? data.filter(role =>
-        role.name.toLowerCase().includes(searchKeyword.toLowerCase())
-        || (role.description || "").toLowerCase().includes(searchKeyword.toLowerCase()),
+    ? data.filter(
+        (role) =>
+          role.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+          (role.description || "").toLowerCase().includes(searchKeyword.toLowerCase()),
       )
     : data;
 
@@ -141,7 +136,7 @@ export function RolePage() {
             <Input
               placeholder="搜索角色..."
               value={searchKeyword}
-              onChange={e => setSearchKeyword(e.target.value)}
+              onChange={(e) => setSearchKeyword(e.target.value)}
               className="pl-9"
             />
           </div>
@@ -179,7 +174,9 @@ export function RolePage() {
         description={`确定要删除角色"${deleteTarget?.name}"吗？`}
         confirmText="删除"
         destructive
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
         onConfirm={handleConfirmDelete}
       />
     </>

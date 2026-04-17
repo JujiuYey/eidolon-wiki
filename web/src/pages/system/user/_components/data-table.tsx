@@ -44,23 +44,17 @@ export function DataTable({
       {
         accessorKey: "username",
         header: "用户名",
-        cell: ({ row }) => (
-          <span className="font-medium">{row.original.username}</span>
-        ),
+        cell: ({ row }) => <span className="font-medium">{row.original.username}</span>,
       },
       {
         accessorKey: "full_name",
         header: "姓名",
-        cell: ({ row }) => (
-          <span>{row.original.full_name || "-"}</span>
-        ),
+        cell: ({ row }) => <span>{row.original.full_name || "-"}</span>,
       },
       {
         accessorKey: "email",
         header: "邮箱",
-        cell: ({ row }) => (
-          <span className="text-muted-foreground">{row.original.email}</span>
-        ),
+        cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span>,
       },
       {
         accessorKey: "roles",
@@ -70,7 +64,7 @@ export function DataTable({
           if (!roles || roles.length === 0) return <span className="text-muted-foreground">-</span>;
           return (
             <div className="flex gap-1 flex-wrap">
-              {roles.map(role => (
+              {roles.map((role) => (
                 <Badge key={role.id} variant="outline" className="text-xs">
                   {role.name}
                 </Badge>
@@ -85,9 +79,7 @@ export function DataTable({
         cell: ({ row }) => {
           const isActive = row.original.status === "active";
           return (
-            <Badge variant={isActive ? "default" : "secondary"}>
-              {isActive ? "启用" : "禁用"}
-            </Badge>
+            <Badge variant={isActive ? "default" : "secondary"}>{isActive ? "启用" : "禁用"}</Badge>
           );
         },
       },
@@ -96,11 +88,7 @@ export function DataTable({
         header: "创建时间",
         cell: ({ row }) => {
           const date = new Date(row.original.created_at);
-          return (
-            <div className="text-muted-foreground">
-              {date.toLocaleDateString("zh-CN")}
-            </div>
-          );
+          return <div className="text-muted-foreground">{date.toLocaleDateString("zh-CN")}</div>;
         },
       },
       {
@@ -129,10 +117,7 @@ export function DataTable({
                   重置密码
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() => onDelete?.(row.original)}
-                >
+                <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(row.original)}>
                   <IconTrash />
                   删除
                 </DropdownMenuItem>

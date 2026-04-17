@@ -82,8 +82,7 @@ export function UserFormModal({
           primary_department_id: value.primary_department_id || undefined,
           role_ids: value.role_ids.length > 0 ? value.role_ids : undefined,
         });
-      }
-      else {
+      } else {
         onSubmit({
           id: user!.id,
           email: value.email,
@@ -104,7 +103,7 @@ export function UserFormModal({
         form.setFieldValue("full_name", user.full_name || "");
         form.setFieldValue("status", user.status);
         form.setFieldValue("primary_department_id", user.primary_department_id);
-        form.setFieldValue("role_ids", user.roles?.map(r => r.id) || []);
+        form.setFieldValue("role_ids", user.roles?.map((r) => r.id) || []);
       }
     }
   }, [open, mode, user, form]);
@@ -133,19 +132,17 @@ export function UserFormModal({
                 name="username"
                 validators={{ onChange: createUserFormSchema.shape.username }}
               >
-                {field => (
+                {(field) => (
                   <div className="flex flex-col gap-3">
                     <Label htmlFor="username">
-                      用户名
-                      {" "}
-                      <span className="text-destructive">*</span>
+                      用户名 <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="username"
                       placeholder="请输入用户名"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={e => field.handleChange(e.target.value)}
+                      onChange={(e) => field.handleChange(e.target.value)}
                     />
                     {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                       <p className="text-destructive text-xs">
@@ -158,16 +155,11 @@ export function UserFormModal({
             )}
 
             {/* 邮箱 */}
-            <form.Field
-              name="email"
-              validators={{ onChange: schema.shape.email }}
-            >
-              {field => (
+            <form.Field name="email" validators={{ onChange: schema.shape.email }}>
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="email">
-                    邮箱
-                    {" "}
-                    <span className="text-destructive">*</span>
+                    邮箱 <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="email"
@@ -175,7 +167,7 @@ export function UserFormModal({
                     placeholder="请输入邮箱"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={e => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs">
@@ -192,7 +184,7 @@ export function UserFormModal({
                 name="password"
                 validators={{ onChange: createUserFormSchema.shape.password }}
               >
-                {field => (
+                {(field) => (
                   <div className="flex flex-col gap-3">
                     <Label htmlFor="password">密码</Label>
                     <Input
@@ -201,7 +193,7 @@ export function UserFormModal({
                       placeholder="请输入密码（可选，留空则使用默认密码）"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={e => field.handleChange(e.target.value)}
+                      onChange={(e) => field.handleChange(e.target.value)}
                     />
                     {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                       <p className="text-destructive text-xs">
@@ -215,7 +207,7 @@ export function UserFormModal({
 
             {/* 姓名 */}
             <form.Field name="full_name">
-              {field => (
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="full_name">姓名</Label>
                   <Input
@@ -223,7 +215,7 @@ export function UserFormModal({
                     placeholder="请输入姓名（可选）"
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
-                    onChange={e => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </div>
               )}
@@ -232,16 +224,14 @@ export function UserFormModal({
             {/* 状态 - 仅编辑时 */}
             {!isCreate && (
               <form.Field name="status">
-                {field => (
+                {(field) => (
                   <div className="flex flex-col gap-3">
                     <Label htmlFor="status">
-                      状态
-                      {" "}
-                      <span className="text-destructive">*</span>
+                      状态 <span className="text-destructive">*</span>
                     </Label>
                     <Select
                       value={field.state.value}
-                      onValueChange={value => field.handleChange(value)}
+                      onValueChange={(value) => field.handleChange(value)}
                     >
                       <SelectTrigger id="status" className="w-full">
                         <SelectValue placeholder="请选择状态" />
@@ -258,20 +248,21 @@ export function UserFormModal({
 
             {/* 所属部门 */}
             <form.Field name="primary_department_id">
-              {field => (
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="primary_department_id">所属部门</Label>
                   <Select
                     value={field.state.value || "none"}
-                    onValueChange={value =>
-                      field.handleChange(value === "none" ? undefined : value)}
+                    onValueChange={(value) =>
+                      field.handleChange(value === "none" ? undefined : value)
+                    }
                   >
                     <SelectTrigger id="primary_department_id" className="w-full">
                       <SelectValue placeholder="请选择部门（可选）" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">无</SelectItem>
-                      {departmentOptions.map(dept => (
+                      {departmentOptions.map((dept) => (
                         <SelectItem key={dept.value} value={dept.value}>
                           {dept.label}
                         </SelectItem>
@@ -284,29 +275,30 @@ export function UserFormModal({
 
             {/* 角色 */}
             <form.Field name="role_ids">
-              {field => (
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label>角色</Label>
                   <div className="flex flex-col gap-2">
-                    {roleOptions.length > 0
-                      ? roleOptions.map(role => (
-                          <label key={role.id} className="flex items-center gap-2 cursor-pointer">
-                            <Checkbox
-                              checked={field.state.value?.includes(role.id)}
-                              onCheckedChange={(checked) => {
-                                const current = field.state.value || [];
-                                if (checked) {
-                                  field.handleChange([...current, role.id]);
-                                }
-                                else {
-                                  field.handleChange(current.filter(id => id !== role.id));
-                                }
-                              }}
-                            />
-                            <span className="text-sm">{role.name}</span>
-                          </label>
-                        ))
-                      : <span className="text-muted-foreground text-xs">暂无可选角色</span>}
+                    {roleOptions.length > 0 ? (
+                      roleOptions.map((role) => (
+                        <label key={role.id} className="flex items-center gap-2 cursor-pointer">
+                          <Checkbox
+                            checked={field.state.value?.includes(role.id)}
+                            onCheckedChange={(checked) => {
+                              const current = field.state.value || [];
+                              if (checked) {
+                                field.handleChange([...current, role.id]);
+                              } else {
+                                field.handleChange(current.filter((id) => id !== role.id));
+                              }
+                            }}
+                          />
+                          <span className="text-sm">{role.name}</span>
+                        </label>
+                      ))
+                    ) : (
+                      <span className="text-muted-foreground text-xs">暂无可选角色</span>
+                    )}
                   </div>
                 </div>
               )}
@@ -314,11 +306,7 @@ export function UserFormModal({
           </div>
           <DialogFooter>
             <Button type="submit" disabled={loading}>
-              {loading
-                ? "保存中..."
-                : isCreate
-                  ? "创建"
-                  : "保存"}
+              {loading ? "保存中..." : isCreate ? "创建" : "保存"}
             </Button>
           </DialogFooter>
         </form>

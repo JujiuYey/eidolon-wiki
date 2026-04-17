@@ -16,11 +16,7 @@ import { ConfirmDialog } from "@/components/sag-ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { UploadDialog } from "@/pages/wiki/documents/_components/upload-dialog";
 
 import { BreadcrumbNav } from "./_components/breadcrumb-nav";
@@ -72,11 +68,9 @@ export function FoldersPage() {
     try {
       const res = await folderApi.list(parentId);
       setData(res || []);
-    }
-    catch {
+    } catch {
       toast.error("加载文件夹列表失败");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   }, []);
@@ -85,8 +79,7 @@ export function FoldersPage() {
     try {
       const res = await folderApi.tree();
       setFolderTreeData(res || []);
-    }
-    catch {
+    } catch {
       toast.error("加载文件夹树失败");
     }
   }, []);
@@ -97,11 +90,9 @@ export function FoldersPage() {
     try {
       const res = await documentApi.list({ folder_id: folderId });
       setDocuments(res || []);
-    }
-    catch {
+    } catch {
       toast.error("加载文档列表失败");
-    }
-    finally {
+    } finally {
       setDocumentsLoading(false);
     }
   }, []);
@@ -115,8 +106,7 @@ export function FoldersPage() {
   useEffect(() => {
     if (currentFolderId) {
       void loadDocuments(currentFolderId);
-    }
-    else {
+    } else {
       setDocuments([]);
     }
   }, [currentFolderId, loadDocuments]);
@@ -126,9 +116,12 @@ export function FoldersPage() {
     setDeleteDocumentTarget(doc);
   }, []);
 
-  const handleOpenDocument = useCallback((doc: Document) => {
-    navigate({ to: "/wiki/tiptap-editor", search: { docId: doc.id } });
-  }, [navigate]);
+  const handleOpenDocument = useCallback(
+    (doc: Document) => {
+      navigate({ to: "/wiki/tiptap-editor", search: { docId: doc.id } });
+    },
+    [navigate],
+  );
 
   const handleConfirmDeleteDocument = async () => {
     if (!deleteDocumentTarget) return;
@@ -140,8 +133,7 @@ export function FoldersPage() {
       if (currentFolderId) {
         void loadDocuments(currentFolderId);
       }
-    }
-    catch (error) {
+    } catch (error) {
       toast.error(`删除失败，${error}`);
     }
     // finally {
@@ -162,63 +154,70 @@ export function FoldersPage() {
 
   // 进入文件夹
   const handleEnterFolder = useCallback((folder: Folder) => {
-    setBreadcrumb(prev => [...prev, { id: folder.id, name: folder.name }]);
+    setBreadcrumb((prev) => [...prev, { id: folder.id, name: folder.name }]);
     setCurrentFolder(folder);
   }, []);
 
   // 面包屑导航点击
-  const handleBreadcrumbNavigate = useCallback((item: { id?: string; name: string } | null, index: number) => {
-    if (item === null) {
-      // 返回根目录
-      setBreadcrumb([]);
-      setCurrentFolder(null);
-    }
-    else {
-      // 导航到指定层级
-      setBreadcrumb(prev => prev.slice(0, index + 1));
-      // 面包屑导航回退时重新获取文件夹详情
-      if (item.id) {
-        folderApi.findOne(item.id).then(setCurrentFolder).catch((error) => {
-          console.error("获取文件夹详情失败:", error);
-        });
+  const handleBreadcrumbNavigate = useCallback(
+    (item: { id?: string; name: string } | null, index: number) => {
+      if (item === null) {
+        // 返回根目录
+        setBreadcrumb([]);
+        setCurrentFolder(null);
+      } else {
+        // 导航到指定层级
+        setBreadcrumb((prev) => prev.slice(0, index + 1));
+        // 面包屑导航回退时重新获取文件夹详情
+        if (item.id) {
+          folderApi
+            .findOne(item.id)
+            .then(setCurrentFolder)
+            .catch((error) => {
+              console.error("获取文件夹详情失败:", error);
+            });
+        }
       }
-    }
-  }, []);
+    },
+    [],
+  );
 
   // 树形导航选择文件夹
-  const handleTreeSelect = useCallback(async (folder: FolderTreeNode | null) => {
-    if (folder === null) {
-      // 返回根目录
-      setBreadcrumb([]);
-      setCurrentFolder(null);
-      return;
-    }
+  const handleTreeSelect = useCallback(
+    async (folder: FolderTreeNode | null) => {
+      if (folder === null) {
+        // 返回根目录
+        setBreadcrumb([]);
+        setCurrentFolder(null);
+        return;
+      }
 
-    // 检查是否在当前面包屑路径中
-    const existingIndex = breadcrumb.findIndex(item => item.id === folder.id);
-    if (existingIndex !== -1) {
-      // 已在路径中，导航到该位置
-      handleBreadcrumbNavigate({ id: folder.id, name: folder.name }, existingIndex);
-    }
-    else {
-      // 不在路径中，进入该文件夹
-      setBreadcrumb([{ id: folder.id, name: folder.name }]);
-      // 获取完整文件夹信息用于右侧面板
-      try {
-        const fullFolder = await folderApi.findOne(folder.id);
-        setCurrentFolder(fullFolder);
+      // 检查是否在当前面包屑路径中
+      const existingIndex = breadcrumb.findIndex((item) => item.id === folder.id);
+      if (existingIndex !== -1) {
+        // 已在路径中，导航到该位置
+        handleBreadcrumbNavigate({ id: folder.id, name: folder.name }, existingIndex);
+      } else {
+        // 不在路径中，进入该文件夹
+        setBreadcrumb([{ id: folder.id, name: folder.name }]);
+        // 获取完整文件夹信息用于右侧面板
+        try {
+          const fullFolder = await folderApi.findOne(folder.id);
+          setCurrentFolder(fullFolder);
+        } catch (error) {
+          console.error("获取文件夹详情失败:", error);
+        }
       }
-      catch (error) {
-        console.error("获取文件夹详情失败:", error);
-      }
-    }
-  }, [breadcrumb, handleBreadcrumbNavigate]);
+    },
+    [breadcrumb, handleBreadcrumbNavigate],
+  );
 
   // Load existing permissions when opening the dialog
   useEffect(() => {
     if (permissionTarget) {
       setPermissionLoading(true);
-      folderApi.getPermissions(permissionTarget.id)
+      folderApi
+        .getPermissions(permissionTarget.id)
         .then((permissions) => {
           setExistingPermissions(permissions);
         })
@@ -256,8 +255,7 @@ export function FoldersPage() {
       toast.success("删除成功");
       void loadFolders(currentFolderId);
       void loadFolderTree();
-    }
-    catch (error) {
+    } catch (error) {
       toast.error(`删除失败，${error}`);
     }
   };
@@ -267,22 +265,22 @@ export function FoldersPage() {
     try {
       if (formMode === "create") {
         // 创建时传入当前目录的 parent_id
-        await folderApi.create({ ...formData as CreateFolderRequest, parent_id: currentFolderId });
+        await folderApi.create({
+          ...(formData as CreateFolderRequest),
+          parent_id: currentFolderId,
+        });
         toast.success("创建成功");
-      }
-      else {
+      } else {
         await folderApi.update(formData as UpdateFolderRequest);
         toast.success("更新成功");
       }
       setFormOpen(false);
       void loadFolders(currentFolderId);
       void loadFolderTree();
-    }
-    catch (error) {
+    } catch (error) {
       console.error("保存文件夹失败:", error);
       toast.error(formMode === "create" ? "创建失败" : "更新失败");
-    }
-    finally {
+    } finally {
       setSubmitting(false);
     }
   };
@@ -294,8 +292,7 @@ export function FoldersPage() {
       await folderApi.setPermissions(permissionTarget.id, { items: selected });
       toast.success("权限设置成功");
       setPermissionTarget(null);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("设置权限失败:", error);
       toast.error("设置权限失败");
     }
@@ -353,7 +350,7 @@ export function FoldersPage() {
                 <Input
                   placeholder="搜索文件夹和文档..."
                   value={searchKeyword}
-                  onChange={e => setSearchKeyword(e.target.value)}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
                   className="pl-9"
                 />
               </div>
@@ -378,10 +375,7 @@ export function FoldersPage() {
 
             {/* 面包屑导航 */}
             {breadcrumb.length > 0 && (
-              <BreadcrumbNav
-                items={breadcrumb}
-                onNavigate={handleBreadcrumbNavigate}
-              />
+              <BreadcrumbNav items={breadcrumb} onNavigate={handleBreadcrumbNavigate} />
             )}
 
             {/* Tab 切换 */}
@@ -434,7 +428,7 @@ export function FoldersPage() {
               activeTab={activeTab}
               onEditFolder={handleEdit}
               onDeleteFolder={handleDelete}
-              onFolderPermission={folder => setPermissionTarget(folder)}
+              onFolderPermission={(folder) => setPermissionTarget(folder)}
               onEnterFolder={handleEnterFolder}
               onDeleteDocument={handleDeleteDocument}
               onOpenDocument={handleOpenDocument}
@@ -452,10 +446,7 @@ export function FoldersPage() {
               maxSize="35%"
               className="min-w-0 overflow-y-auto border-l bg-background"
             >
-              <FolderDetailPanel
-                folder={currentFolder}
-                onEdit={handleEdit}
-              />
+              <FolderDetailPanel folder={currentFolder} onEdit={handleEdit} />
             </ResizablePanel>
           </>
         )}
@@ -473,7 +464,9 @@ export function FoldersPage() {
       <PermissionPickerDialog
         open={!!permissionTarget && !permissionLoading}
         defaultSelected={existingPermissions}
-        onOpenChange={(open) => { if (!open) setPermissionTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setPermissionTarget(null);
+        }}
         onConfirm={handlePermissionConfirm}
       />
 
@@ -496,7 +489,9 @@ export function FoldersPage() {
         description={`确定要删除文件夹"${deleteTarget?.name}"吗？此操作将删除该文件夹及其所有文档，且无法撤销。`}
         confirmText="删除"
         destructive
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
         onConfirm={handleConfirmDelete}
       />
 
@@ -507,7 +502,9 @@ export function FoldersPage() {
         description={`确定要删除文档"${deleteDocumentTarget?.filename}"吗？此操作无法撤销。`}
         confirmText="删除"
         destructive
-        onOpenChange={(open) => { if (!open) setDeleteDocumentTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteDocumentTarget(null);
+        }}
         onConfirm={handleConfirmDeleteDocument}
       />
     </div>

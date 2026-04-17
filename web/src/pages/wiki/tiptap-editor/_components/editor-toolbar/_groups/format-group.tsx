@@ -12,13 +12,7 @@ export function FormatGroup() {
     <>
       <ToolbarButton
         icon={
-          formatPainter.isLocked
-            ? (
-                <Lock className="h-4 w-4" />
-              )
-            : (
-                <Paintbrush className="h-4 w-4" />
-              )
+          formatPainter.isLocked ? <Lock className="h-4 w-4" /> : <Paintbrush className="h-4 w-4" />
         }
         title={
           formatPainter.isLocked
@@ -39,6 +33,5 @@ export function FormatGroup() {
         onClick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()}
       />
     </>
-
   );
 }

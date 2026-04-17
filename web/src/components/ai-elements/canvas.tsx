@@ -1,5 +1,4 @@
 import "@xyflow/react/dist/style.css";
-
 import type { ReactFlowProps } from "@xyflow/react";
 import { Background, ReactFlow } from "@xyflow/react";
 import type { ReactNode } from "react";

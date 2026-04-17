@@ -49,30 +49,23 @@ export function DataTable({
         accessorKey: "name",
         header: "部门名称",
         cell: ({ row }) => (
-          <div
-            className="flex items-center"
-            style={{ paddingLeft: `${row.depth * 24}px` }}
-          >
-            {row.subRows?.length > 0
-              ? (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-6 mr-1"
-                    onClick={row.getToggleExpandedHandler()}
-                  >
-                    {row.getIsExpanded()
-                      ? (
-                          <IconChevronDown className="size-4" />
-                        )
-                      : (
-                          <IconChevronRight className="size-4" />
-                        )}
-                  </Button>
-                )
-              : (
-                  <span className="inline-block w-7" />
+          <div className="flex items-center" style={{ paddingLeft: `${row.depth * 24}px` }}>
+            {row.subRows?.length > 0 ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-6 mr-1"
+                onClick={row.getToggleExpandedHandler()}
+              >
+                {row.getIsExpanded() ? (
+                  <IconChevronDown className="size-4" />
+                ) : (
+                  <IconChevronRight className="size-4" />
                 )}
+              </Button>
+            ) : (
+              <span className="inline-block w-7" />
+            )}
             <span className="font-medium">{row.original.name}</span>
           </div>
         ),
@@ -82,11 +75,7 @@ export function DataTable({
         header: "描述",
         cell: ({ row }) => {
           const description = row.original.description || "-";
-          return (
-            <div className="text-muted-foreground max-w-xs truncate">
-              {description}
-            </div>
-          );
+          return <div className="text-muted-foreground max-w-xs truncate">{description}</div>;
         },
       },
       {
@@ -94,11 +83,7 @@ export function DataTable({
         header: "创建时间",
         cell: ({ row }) => {
           const date = new Date(row.original.created_at);
-          return (
-            <div className="text-muted-foreground">
-              {date.toLocaleDateString("zh-CN")}
-            </div>
-          );
+          return <div className="text-muted-foreground">{date.toLocaleDateString("zh-CN")}</div>;
         },
       },
       {
@@ -123,10 +108,7 @@ export function DataTable({
                   编辑
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() => onDelete?.(row.original)}
-                >
+                <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(row.original)}>
                   <IconTrash />
                   删除
                 </DropdownMenuItem>
@@ -149,8 +131,8 @@ export function DataTable({
         state: { expanded, globalFilter },
         onExpandedChange: setExpanded,
         onGlobalFilterChange,
-        getSubRows: row => row.children,
-        getRowId: row => row.id,
+        getSubRows: (row) => row.children,
+        getRowId: (row) => row.id,
         getExpandedRowModel: getExpandedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
       }}

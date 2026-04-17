@@ -24,35 +24,20 @@ describe("EditorFooter", () => {
     const pageSetup = createMockPageSetup();
 
     const { rerender } = render(
-      <EditorFooter
-        saveStatus="saved"
-        wordCount={128}
-        onSave={onSave}
-        pageSetup={pageSetup}
-      />,
+      <EditorFooter saveStatus="saved" wordCount={128} onSave={onSave} pageSetup={pageSetup} />,
     );
 
     expect(screen.getByText(/字数:\s*128/)).toBeInTheDocument();
     expect(screen.getByText("已保存")).toBeInTheDocument();
 
     rerender(
-      <EditorFooter
-        saveStatus="saving"
-        wordCount={256}
-        onSave={onSave}
-        pageSetup={pageSetup}
-      />,
+      <EditorFooter saveStatus="saving" wordCount={256} onSave={onSave} pageSetup={pageSetup} />,
     );
     expect(screen.getByText("保存中...")).toBeInTheDocument();
     expect(screen.getByText(/字数:\s*256/)).toBeInTheDocument();
 
     rerender(
-      <EditorFooter
-        saveStatus="unsaved"
-        wordCount={512}
-        onSave={onSave}
-        pageSetup={pageSetup}
-      />,
+      <EditorFooter saveStatus="unsaved" wordCount={512} onSave={onSave} pageSetup={pageSetup} />,
     );
     expect(screen.getByText("未保存")).toBeInTheDocument();
 
@@ -64,12 +49,7 @@ describe("EditorFooter", () => {
     const pageSetup = createMockPageSetup({ zoom: 0.8 });
 
     render(
-      <EditorFooter
-        saveStatus="saved"
-        wordCount={0}
-        onSave={vi.fn()}
-        pageSetup={pageSetup}
-      />,
+      <EditorFooter saveStatus="saved" wordCount={0} onSave={vi.fn()} pageSetup={pageSetup} />,
     );
 
     expect(screen.getByText("80%")).toBeInTheDocument();

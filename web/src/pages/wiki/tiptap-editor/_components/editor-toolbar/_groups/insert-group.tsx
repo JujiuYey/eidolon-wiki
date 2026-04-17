@@ -44,11 +44,17 @@ export function InsertGroup() {
         icon={<Table2 className="h-4 w-4" />}
         title="插入表格"
         disabled={!editor}
-        onClick={() => editor?.chain().focus().insertTable({
-          rows: 3,
-          cols: 3,
-          withHeaderRow: true,
-        }).run()}
+        onClick={() =>
+          editor
+            ?.chain()
+            .focus()
+            .insertTable({
+              rows: 3,
+              cols: 3,
+              withHeaderRow: true,
+            })
+            .run()
+        }
       />
       <ToolbarButton
         icon={<ImagePlus className="h-4 w-4" />}

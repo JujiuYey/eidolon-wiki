@@ -72,8 +72,7 @@ const RESOURCE_PATH = "/api/system/user";
 // 用户相关 API
 export const userApi = {
   // 获取用户详情
-  findOne: (id: string) =>
-    request.get<User>(`${RESOURCE_PATH}/${id}`),
+  findOne: (id: string) => request.get<User>(`${RESOURCE_PATH}/${id}`),
 
   // 获取用户列表
   page: (page = 1, pageSize = 10, search?: string) =>
@@ -82,16 +81,13 @@ export const userApi = {
     }),
 
   // 创建用户
-  create: (data: CreateUserRequest) =>
-    request.post<User>(RESOURCE_PATH, data),
+  create: (data: CreateUserRequest) => request.post<User>(RESOURCE_PATH, data),
 
   // 更新用户
-  update: (data: UpdateUserRequest) =>
-    request.put<User>(RESOURCE_PATH, data),
+  update: (data: UpdateUserRequest) => request.put<User>(RESOURCE_PATH, data),
 
   // 删除用户
-  delete: (id: string) =>
-    request.delete(`${RESOURCE_PATH}/${id}`),
+  delete: (id: string) => request.delete(`${RESOURCE_PATH}/${id}`),
 
   // 重置密码
   resetPassword: (data: ResetPasswordRequest) =>

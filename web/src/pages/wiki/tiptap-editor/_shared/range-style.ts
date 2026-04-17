@@ -39,7 +39,10 @@ function callCommand(chain: CommandChain, command: string, ...args: unknown[]) {
   return true;
 }
 
-export function applyRangeStyle(editor: Editor | null | undefined, style: Partial<RangeStyle> | null | undefined) {
+export function applyRangeStyle(
+  editor: Editor | null | undefined,
+  style: Partial<RangeStyle> | null | undefined,
+) {
   if (!editor || !style) {
     return;
   }
@@ -58,9 +61,8 @@ export function applyRangeStyle(editor: Editor | null | undefined, style: Partia
       return;
     }
 
-    const didApply
-      = callCommand(chain, preferredCommand, ...args)
-        || callCommand(chain, fallbackCommand, ...args);
+    const didApply =
+      callCommand(chain, preferredCommand, ...args) || callCommand(chain, fallbackCommand, ...args);
 
     if (didApply) {
       hasChanges = true;
@@ -69,7 +71,12 @@ export function applyRangeStyle(editor: Editor | null | undefined, style: Partia
 
   applyIfInactive(style.bold, !!editor.isActive?.("bold"), "setBold", "toggleBold");
   applyIfInactive(style.italic, !!editor.isActive?.("italic"), "setItalic", "toggleItalic");
-  applyIfInactive(style.underline, !!editor.isActive?.("underline"), "setUnderline", "toggleUnderline");
+  applyIfInactive(
+    style.underline,
+    !!editor.isActive?.("underline"),
+    "setUnderline",
+    "toggleUnderline",
+  );
   applyIfInactive(style.strikethrough, !!editor.isActive?.("strike"), "setStrike", "toggleStrike");
   applyIfInactive(style.code, !!editor.isActive?.("code"), "setCode", "toggleCode");
 
@@ -80,9 +87,9 @@ export function applyRangeStyle(editor: Editor | null | undefined, style: Partia
   }
 
   if (style.highlight && editor.getAttributes?.("highlight")?.color !== style.highlight) {
-    const didApply
-      = callCommand(chain, "setHighlight", { color: style.highlight })
-        || callCommand(chain, "toggleHighlight", { color: style.highlight });
+    const didApply =
+      callCommand(chain, "setHighlight", { color: style.highlight }) ||
+      callCommand(chain, "toggleHighlight", { color: style.highlight });
 
     if (didApply) {
       hasChanges = true;
@@ -115,15 +122,27 @@ export function applyRangeStyle(editor: Editor | null | undefined, style: Partia
     if (didApply) {
       hasChanges = true;
     }
-  }
-  else if (style.bulletList) {
-    applyIfInactive(true, !!editor.isActive?.("bulletList"), "toggleBulletList", "toggleBulletList");
-  }
-  else if (style.orderedList) {
-    applyIfInactive(true, !!editor.isActive?.("orderedList"), "toggleOrderedList", "toggleOrderedList");
-  }
-  else if (style.blockquote) {
-    applyIfInactive(true, !!editor.isActive?.("blockquote"), "toggleBlockquote", "toggleBlockquote");
+  } else if (style.bulletList) {
+    applyIfInactive(
+      true,
+      !!editor.isActive?.("bulletList"),
+      "toggleBulletList",
+      "toggleBulletList",
+    );
+  } else if (style.orderedList) {
+    applyIfInactive(
+      true,
+      !!editor.isActive?.("orderedList"),
+      "toggleOrderedList",
+      "toggleOrderedList",
+    );
+  } else if (style.blockquote) {
+    applyIfInactive(
+      true,
+      !!editor.isActive?.("blockquote"),
+      "toggleBlockquote",
+      "toggleBlockquote",
+    );
   }
 
   if (hasChanges) {

@@ -17,11 +17,7 @@ export function AgentPage() {
     <div className="flex h-screen overflow-hidden">
       {/* 右侧聊天面板 */}
       <div className="flex-1">
-        <ChatPanel
-          messages={messages}
-          loading={loading}
-          onSend={handleSend}
-        />
+        <ChatPanel messages={messages} loading={loading} onSend={handleSend} />
       </div>
     </div>
   );

@@ -60,11 +60,7 @@ function ReselectHarness() {
         reselect
       </button>
 
-      <ModelConfigForm
-        key={config.id}
-        config={config}
-        onRefresh={vi.fn()}
-      />
+      <ModelConfigForm key={config.id} config={config} onRefresh={vi.fn()} />
     </>
   );
 }

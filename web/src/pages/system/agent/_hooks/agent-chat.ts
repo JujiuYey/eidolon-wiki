@@ -64,177 +64,179 @@ export function useAgentChat(): UseAgentChat {
   const [loading, setLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || loading) return;
+  const sendMessage = useCallback(
+    async (text: string) => {
+      if (!text.trim() || loading) return;
 
-    // 停止之前的请求
-    abortControllerRef.current?.abort();
-    abortControllerRef.current = new AbortController();
+      // 停止之前的请求
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
 
-    const userMsg: AgentMessage = {
-      id: generateId(),
-      role: "user",
-      content: text,
-      created_at: new Date().toISOString(),
-    };
+      const userMsg: AgentMessage = {
+        id: generateId(),
+        role: "user",
+        content: text,
+        created_at: new Date().toISOString(),
+      };
 
-    setMessages(prev => [...prev, userMsg]);
-    setLoading(true);
+      setMessages((prev) => [...prev, userMsg]);
+      setLoading(true);
 
-    let assistantMsg: AgentMessage | null = null;
-    let currentToolCalls: AgentToolCall[] = [];
+      let assistantMsg: AgentMessage | null = null;
+      let currentToolCalls: AgentToolCall[] = [];
 
-    sseRequest({
-      url: "/api/ai/chat",
-      method: "POST",
-      body: {
-        query: text,
-      },
-      signal: abortControllerRef.current.signal,
-      onMessage: (data) => {
-        try {
-          const parsed = JSON.parse(data);
-          switch (parsed.type) {
-            case "stream_chunk": {
-              // 流式内容
-              if (!assistantMsg) {
-                assistantMsg = {
-                  id: generateId(),
-                  role: "assistant",
-                  content: "",
-                  created_at: new Date().toISOString(),
-                };
-                setMessages(prev => [...prev, assistantMsg!]);
+      sseRequest({
+        url: "/api/ai/chat",
+        method: "POST",
+        body: {
+          query: text,
+        },
+        signal: abortControllerRef.current.signal,
+        onMessage: (data) => {
+          try {
+            const parsed = JSON.parse(data);
+            switch (parsed.type) {
+              case "stream_chunk": {
+                // 流式内容
+                if (!assistantMsg) {
+                  assistantMsg = {
+                    id: generateId(),
+                    role: "assistant",
+                    content: "",
+                    created_at: new Date().toISOString(),
+                  };
+                  setMessages((prev) => [...prev, assistantMsg!]);
+                }
+                assistantMsg.content += parsed.content;
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const lastMsg = updated[updated.length - 1];
+                  if (lastMsg?.id === assistantMsg?.id) {
+                    lastMsg.content = assistantMsg!.content;
+                  }
+                  return updated;
+                });
+                break;
               }
-              assistantMsg.content += parsed.content;
+
+              case "tool_result": {
+                // 工具调用结果
+                if (parsed.tool_calls && Array.isArray(parsed.tool_calls)) {
+                  currentToolCalls = parsed.tool_calls.map(
+                    (tc: {
+                      id?: string;
+                      function?: { name?: string; arguments?: string };
+                      output?: string;
+                    }) => {
+                      let input: Record<string, unknown> = {};
+                      try {
+                        if (tc.function?.arguments) {
+                          input = JSON.parse(tc.function.arguments);
+                        }
+                      } catch {
+                        // ignore parse error
+                      }
+                      let output: unknown = undefined;
+                      if (tc.output) {
+                        try {
+                          output = JSON.parse(tc.output);
+                        } catch {
+                          output = tc.output;
+                        }
+                      }
+                      return {
+                        id: tc.id || generateId(),
+                        name: tc.function?.name || "unknown",
+                        input,
+                        output,
+                      };
+                    },
+                  );
+                }
+                break;
+              }
+
+              case "message": {
+                // 最终消息，可能包含工具调用
+                if (!assistantMsg) {
+                  assistantMsg = {
+                    id: generateId(),
+                    role: "assistant",
+                    content: "",
+                    created_at: new Date().toISOString(),
+                  };
+                  setMessages((prev) => [...prev, assistantMsg!]);
+                }
+                if (parsed.content) {
+                  assistantMsg.content += parsed.content;
+                }
+                if (parsed.tool_calls && Array.isArray(parsed.tool_calls)) {
+                  currentToolCalls = parsed.tool_calls.map(
+                    (tc: {
+                      id?: string;
+                      function?: { name?: string; arguments?: string };
+                      output?: string;
+                    }) => {
+                      let input: Record<string, unknown> = {};
+                      try {
+                        if (tc.function?.arguments) {
+                          input = JSON.parse(tc.function.arguments);
+                        }
+                      } catch {
+                        // ignore parse error
+                      }
+                      let output: unknown = undefined;
+                      if (tc.output) {
+                        try {
+                          output = JSON.parse(tc.output);
+                        } catch {
+                          output = tc.output;
+                        }
+                      }
+                      return {
+                        id: tc.id || generateId(),
+                        name: tc.function?.name || "unknown",
+                        input,
+                        output,
+                      };
+                    },
+                  );
+                }
+                break;
+              }
+            }
+
+            // 更新消息的工具调用
+            if (currentToolCalls.length > 0 && assistantMsg) {
               setMessages((prev) => {
                 const updated = [...prev];
                 const lastMsg = updated[updated.length - 1];
                 if (lastMsg?.id === assistantMsg?.id) {
-                  lastMsg.content = assistantMsg!.content;
+                  lastMsg.tool_calls = [...currentToolCalls];
                 }
                 return updated;
               });
-              break;
             }
-
-            case "tool_result": {
-              // 工具调用结果
-              if (parsed.tool_calls && Array.isArray(parsed.tool_calls)) {
-                currentToolCalls = parsed.tool_calls.map((tc: {
-                  id?: string;
-                  function?: { name?: string; arguments?: string };
-                  output?: string;
-                }) => {
-                  let input: Record<string, unknown> = {};
-                  try {
-                    if (tc.function?.arguments) {
-                      input = JSON.parse(tc.function.arguments);
-                    }
-                  }
-                  catch {
-                    // ignore parse error
-                  }
-                  let output: unknown = undefined;
-                  if (tc.output) {
-                    try {
-                      output = JSON.parse(tc.output);
-                    }
-                    catch {
-                      output = tc.output;
-                    }
-                  }
-                  return {
-                    id: tc.id || generateId(),
-                    name: tc.function?.name || "unknown",
-                    input,
-                    output,
-                  };
-                });
-              }
-              break;
-            }
-
-            case "message": {
-              // 最终消息，可能包含工具调用
-              if (!assistantMsg) {
-                assistantMsg = {
-                  id: generateId(),
-                  role: "assistant",
-                  content: "",
-                  created_at: new Date().toISOString(),
-                };
-                setMessages(prev => [...prev, assistantMsg!]);
-              }
-              if (parsed.content) {
-                assistantMsg.content += parsed.content;
-              }
-              if (parsed.tool_calls && Array.isArray(parsed.tool_calls)) {
-                currentToolCalls = parsed.tool_calls.map((tc: {
-                  id?: string;
-                  function?: { name?: string; arguments?: string };
-                  output?: string;
-                }) => {
-                  let input: Record<string, unknown> = {};
-                  try {
-                    if (tc.function?.arguments) {
-                      input = JSON.parse(tc.function.arguments);
-                    }
-                  }
-                  catch {
-                    // ignore parse error
-                  }
-                  let output: unknown = undefined;
-                  if (tc.output) {
-                    try {
-                      output = JSON.parse(tc.output);
-                    }
-                    catch {
-                      output = tc.output;
-                    }
-                  }
-                  return {
-                    id: tc.id || generateId(),
-                    name: tc.function?.name || "unknown",
-                    input,
-                    output,
-                  };
-                });
-              }
-              break;
-            }
+          } catch {
+            // 忽略解析错误
           }
-
-          // 更新消息的工具调用
-          if (currentToolCalls.length > 0 && assistantMsg) {
-            setMessages((prev) => {
-              const updated = [...prev];
-              const lastMsg = updated[updated.length - 1];
-              if (lastMsg?.id === assistantMsg?.id) {
-                lastMsg.tool_calls = [...currentToolCalls];
-              }
-              return updated;
-            });
-          }
-        }
-        catch {
-          // 忽略解析错误
-        }
-      },
-      onError: (error) => {
-        const errorMsg: AgentMessage = {
-          id: generateId(),
-          role: "assistant",
-          content: `请求失败：${error.message || "未知错误"}`,
-          created_at: new Date().toISOString(),
-        };
-        setMessages(prev => [...prev, errorMsg]);
-      },
-      onComplete: () => {
-        setLoading(false);
-      },
-    });
-  }, [loading]);
+        },
+        onError: (error) => {
+          const errorMsg: AgentMessage = {
+            id: generateId(),
+            role: "assistant",
+            content: `请求失败：${error.message || "未知错误"}`,
+            created_at: new Date().toISOString(),
+          };
+          setMessages((prev) => [...prev, errorMsg]);
+        },
+        onComplete: () => {
+          setLoading(false);
+        },
+      });
+    },
+    [loading],
+  );
 
   return {
     messages,

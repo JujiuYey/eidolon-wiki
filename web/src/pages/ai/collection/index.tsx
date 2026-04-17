@@ -62,8 +62,7 @@ export function CollectionPage() {
       setNewName("");
       setNewVectorSize("1024");
       setNewDistance("Cosine");
-    }
-    catch {
+    } catch {
       // 错误已经在 mutation 中处理
     }
   };
@@ -72,8 +71,7 @@ export function CollectionPage() {
     if (!deleteTarget) return;
     try {
       await deleteMutation.mutateAsync(deleteTarget.name);
-    }
-    finally {
+    } finally {
       setDeleteTarget(null);
     }
   };
@@ -103,66 +101,58 @@ export function CollectionPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading
-            ? (
-                <div className="text-center py-8 text-gray-500">加载中...</div>
-              )
-            : collections.length === 0
-              ? (
-                  <div className="text-center py-8 text-gray-500">
-                    暂无 Collection，请点击上方按钮创建
-                  </div>
-                )
-              : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>名称</TableHead>
-                        <TableHead>状态</TableHead>
-                        <TableHead>向量维度</TableHead>
-                        <TableHead>距离函数</TableHead>
-                        <TableHead className="text-right">向量数量</TableHead>
-                        <TableHead className="text-right">Points 数量</TableHead>
-                        <TableHead className="text-right">操作</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {collections.map(col => (
-                        <TableRow key={col.name}>
-                          <TableCell className="font-medium">{col.name}</TableCell>
-                          <TableCell>
-                            <span
-                              className={`px-2 py-1 rounded text-xs ${
-                                col.status === "Green"
-                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                                  : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                              }`}
-                            >
-                              {col.status}
-                            </span>
-                          </TableCell>
-                          <TableCell>{col.vector_size}</TableCell>
-                          <TableCell>{col.distance_function}</TableCell>
-                          <TableCell className="text-right">
-                            {col.vectors_count.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {col.points_count.toLocaleString()}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setDeleteTarget(col)}
-                            >
-                              <IconTrash className="w-4 h-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+          {isLoading ? (
+            <div className="text-center py-8 text-gray-500">加载中...</div>
+          ) : collections.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              暂无 Collection，请点击上方按钮创建
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>名称</TableHead>
+                  <TableHead>状态</TableHead>
+                  <TableHead>向量维度</TableHead>
+                  <TableHead>距离函数</TableHead>
+                  <TableHead className="text-right">向量数量</TableHead>
+                  <TableHead className="text-right">Points 数量</TableHead>
+                  <TableHead className="text-right">操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {collections.map((col) => (
+                  <TableRow key={col.name}>
+                    <TableCell className="font-medium">{col.name}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          col.status === "Green"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                        }`}
+                      >
+                        {col.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>{col.vector_size}</TableCell>
+                    <TableCell>{col.distance_function}</TableCell>
+                    <TableCell className="text-right">
+                      {col.vectors_count.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {col.points_count.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(col)}>
+                        <IconTrash className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 
@@ -182,7 +172,7 @@ export function CollectionPage() {
               <Input
                 id="name"
                 value={newName}
-                onChange={e => setNewName(e.target.value)}
+                onChange={(e) => setNewName(e.target.value)}
                 placeholder="例如: documents"
               />
             </div>
@@ -228,10 +218,7 @@ export function CollectionPage() {
             <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
               取消
             </Button>
-            <Button
-              onClick={handleCreate}
-              disabled={!newName.trim() || createMutation.isPending}
-            >
+            <Button onClick={handleCreate} disabled={!newName.trim() || createMutation.isPending}>
               {createMutation.isPending ? "创建中..." : "创建"}
             </Button>
           </DialogFooter>
@@ -245,7 +232,7 @@ export function CollectionPage() {
         description={`确定要删除 Collection "${deleteTarget?.name}" 吗？此操作不可撤销，所有数据将被永久删除。`}
         confirmText="删除"
         destructive
-        onOpenChange={open => !open && setDeleteTarget(null)}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
         onConfirm={handleDelete}
       />
     </div>

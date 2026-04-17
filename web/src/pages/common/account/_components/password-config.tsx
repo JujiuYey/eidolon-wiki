@@ -5,20 +5,14 @@ import { toast } from "sonner";
 
 import { userApi } from "@/api/system/user";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/auth";
 
 export function PasswordConfig() {
   const navigate = useNavigate();
-  const clearAuth = useAuthStore(s => s.clearAuth);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
 
   const [formData, setFormData] = useState({
     oldPassword: "",
@@ -83,11 +77,9 @@ export function PasswordConfig() {
         clearAuth();
         navigate({ to: "/login" });
       }, 1500);
-    }
-    catch (error: any) {
+    } catch (error: any) {
       toast.error(error.message || "密码修改失败");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -109,7 +101,7 @@ export function PasswordConfig() {
           id={id}
           type={show ? "text" : "password"}
           value={value}
-          onChange={e => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className="pr-10"
         />
@@ -118,14 +110,10 @@ export function PasswordConfig() {
           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           onClick={onToggle}
         >
-          {show
-            ? <IconEyeOff className="h-4 w-4" />
-            : <IconEye className="h-4 w-4" />}
+          {show ? <IconEyeOff className="h-4 w-4" /> : <IconEye className="h-4 w-4" />}
         </button>
       </div>
-      {hint && (
-        <p className="text-xs text-muted-foreground">{hint}</p>
-      )}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 
@@ -143,7 +131,7 @@ export function PasswordConfig() {
           "请输入原始密码",
           showOldPassword,
           () => setShowOldPassword(!showOldPassword),
-          v => setFormData(prev => ({ ...prev, oldPassword: v })),
+          (v) => setFormData((prev) => ({ ...prev, oldPassword: v })),
         )}
 
         {renderPasswordField(
@@ -153,7 +141,7 @@ export function PasswordConfig() {
           "请输入新密码",
           showNewPassword,
           () => setShowNewPassword(!showNewPassword),
-          v => setFormData(prev => ({ ...prev, newPassword: v })),
+          (v) => setFormData((prev) => ({ ...prev, newPassword: v })),
           "密码长度至少为 6 位",
         )}
 
@@ -164,7 +152,7 @@ export function PasswordConfig() {
           "请再次输入新密码",
           showConfirmPassword,
           () => setShowConfirmPassword(!showConfirmPassword),
-          v => setFormData(prev => ({ ...prev, confirmPassword: v })),
+          (v) => setFormData((prev) => ({ ...prev, confirmPassword: v })),
         )}
 
         {/* 保存按钮 */}

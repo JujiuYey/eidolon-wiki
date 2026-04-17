@@ -5,20 +5,14 @@ import { toast } from "sonner";
 import { userApi } from "@/api/system/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/auth";
 
 export function AccountConfig() {
-  const user = useAuthStore(s => s.user);
-  const setUser = useAuthStore(s => s.setUser);
+  const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -71,13 +65,11 @@ export function AccountConfig() {
       const uploadFormData = new FormData();
       uploadFormData.append("file", file);
       const result = await userApi.uploadAvatar(uploadFormData);
-      setFormData(prev => ({ ...prev, avatar: result.file_path }));
+      setFormData((prev) => ({ ...prev, avatar: result.file_path }));
       toast.success("头像上传成功");
-    }
-    catch (error: any) {
+    } catch (error: any) {
       toast.error(error.message || "头像上传失败");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -110,11 +102,9 @@ export function AccountConfig() {
       });
 
       toast.success("保存成功");
-    }
-    catch (error: any) {
+    } catch (error: any) {
       toast.error(error.message || "保存失败");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -129,21 +119,12 @@ export function AccountConfig() {
         {/* 头像上传 */}
         <div className="flex items-center gap-6">
           <Avatar className="h-20 w-20">
-            <AvatarImage
-              src={avatarUrl}
-              alt={formData.full_name || user?.username}
-            />
-            <AvatarFallback className="text-2xl">
-              {getUserInitial()}
-            </AvatarFallback>
+            <AvatarImage src={avatarUrl} alt={formData.full_name || user?.username} />
+            <AvatarFallback className="text-2xl">{getUserInitial()}</AvatarFallback>
           </Avatar>
           <div className="space-y-2">
             <div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => avatarInputRef.current?.click()}
-              >
+              <Button variant="outline" size="sm" onClick={() => avatarInputRef.current?.click()}>
                 <IconUpload className="mr-2 h-4 w-4" />
                 上传头像
               </Button>
@@ -155,21 +136,14 @@ export function AccountConfig() {
                 onChange={handleAvatarChange}
               />
             </div>
-            <p className="text-xs text-muted-foreground">
-              支持 JPG、PNG 格式，大小不超过 5MB
-            </p>
+            <p className="text-xs text-muted-foreground">支持 JPG、PNG 格式，大小不超过 5MB</p>
           </div>
         </div>
 
         {/* 用户名（只读） */}
         <div className="space-y-2">
           <Label htmlFor="username">用户名</Label>
-          <Input
-            id="username"
-            value={formData.username}
-            disabled
-            className="bg-muted"
-          />
+          <Input id="username" value={formData.username} disabled className="bg-muted" />
           <p className="text-xs text-muted-foreground">用户名不可修改</p>
         </div>
 
@@ -179,8 +153,7 @@ export function AccountConfig() {
           <Input
             id="full_name"
             value={formData.full_name}
-            onChange={e =>
-              setFormData(prev => ({ ...prev, full_name: e.target.value }))}
+            onChange={(e) => setFormData((prev) => ({ ...prev, full_name: e.target.value }))}
             placeholder="请输入您的姓名"
           />
         </div>
@@ -192,8 +165,7 @@ export function AccountConfig() {
             id="email"
             type="email"
             value={formData.email}
-            onChange={e =>
-              setFormData(prev => ({ ...prev, email: e.target.value }))}
+            onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
             placeholder="请输入您的邮箱"
           />
         </div>

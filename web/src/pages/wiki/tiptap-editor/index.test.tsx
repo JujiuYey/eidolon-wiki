@@ -52,9 +52,7 @@ vi.mock("./_components/editor-catalog", () => ({
     return (
       <button type="button" onClick={props.onToggle}>
         catalog:
-        {props.open ? "open" : "closed"}
-        :
-        {props.editor?.id ?? "none"}
+        {props.open ? "open" : "closed"}:{props.editor?.id ?? "none"}
       </button>
     );
   },

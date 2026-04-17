@@ -1,12 +1,7 @@
 "use client";
 
 import { useControllableState } from "@radix-ui/react-use-controllable-state";
-import {
-  AlertTriangleIcon,
-  CheckIcon,
-  ChevronDownIcon,
-  CopyIcon,
-} from "lucide-react";
+import { AlertTriangleIcon, CheckIcon, ChevronDownIcon, CopyIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 import {
   createContext,
@@ -20,11 +15,7 @@ import {
 } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
 // Regex patterns for parsing stack traces
@@ -74,10 +65,10 @@ const parseStackFrame = (line: string): StackFrame => {
   const withParensMatch = trimmed.match(STACK_FRAME_WITH_PARENS_REGEX);
   if (withParensMatch) {
     const [, functionName, filePath, lineNum, colNum] = withParensMatch;
-    const isInternal
-      = filePath.includes("node_modules")
-        || filePath.startsWith("node:")
-        || filePath.includes("internal/");
+    const isInternal =
+      filePath.includes("node_modules") ||
+      filePath.startsWith("node:") ||
+      filePath.includes("internal/");
     return {
       columnNumber: colNum ? Number.parseInt(colNum, 10) : null,
       filePath: filePath ?? null,
@@ -92,10 +83,10 @@ const parseStackFrame = (line: string): StackFrame => {
   const withoutFnMatch = trimmed.match(STACK_FRAME_WITHOUT_FN_REGEX);
   if (withoutFnMatch) {
     const [, filePath, lineNum, colNum] = withoutFnMatch;
-    const isInternal
-      = (filePath?.includes("node_modules") ?? false)
-        || (filePath?.startsWith("node:") ?? false)
-        || (filePath?.includes("internal/") ?? false);
+    const isInternal =
+      (filePath?.includes("node_modules") ?? false) ||
+      (filePath?.startsWith("node:") ?? false) ||
+      (filePath?.includes("internal/") ?? false);
     return {
       columnNumber: colNum ? Number.parseInt(colNum, 10) : null,
       filePath: filePath ?? null,
@@ -118,7 +109,7 @@ const parseStackFrame = (line: string): StackFrame => {
 };
 
 const parseStackTrace = (trace: string): ParsedStackTrace => {
-  const lines = trace.split("\n").filter(line => line.trim());
+  const lines = trace.split("\n").filter((line) => line.trim());
 
   if (lines.length === 0) {
     return {
@@ -144,7 +135,7 @@ const parseStackTrace = (trace: string): ParsedStackTrace => {
   // Parse stack frames (lines starting with "at")
   const frames = lines
     .slice(1)
-    .filter(line => line.trim().startsWith("at "))
+    .filter((line) => line.trim().startsWith("at "))
     .map(parseStackFrame);
 
   return {
@@ -211,43 +202,33 @@ export const StackTrace = memo(
 
 export type StackTraceHeaderProps = ComponentProps<typeof CollapsibleTrigger>;
 
-export const StackTraceHeader = memo(
-  ({ className, children, ...props }: StackTraceHeaderProps) => {
-    const { isOpen, setIsOpen } = useStackTrace();
+export const StackTraceHeader = memo(({ className, children, ...props }: StackTraceHeaderProps) => {
+  const { isOpen, setIsOpen } = useStackTrace();
 
-    return (
-      <Collapsible onOpenChange={setIsOpen} open={isOpen}>
-        <CollapsibleTrigger asChild {...props}>
-          <div
-            className={cn(
-              "flex w-full cursor-pointer items-center gap-3 p-3 text-left transition-colors hover:bg-muted/50",
-              className,
-            )}
-          >
-            {children}
-          </div>
-        </CollapsibleTrigger>
-      </Collapsible>
-    );
-  },
-);
+  return (
+    <Collapsible onOpenChange={setIsOpen} open={isOpen}>
+      <CollapsibleTrigger asChild {...props}>
+        <div
+          className={cn(
+            "flex w-full cursor-pointer items-center gap-3 p-3 text-left transition-colors hover:bg-muted/50",
+            className,
+          )}
+        >
+          {children}
+        </div>
+      </CollapsibleTrigger>
+    </Collapsible>
+  );
+});
 
 export type StackTraceErrorProps = ComponentProps<"div">;
 
-export const StackTraceError = memo(
-  ({ className, children, ...props }: StackTraceErrorProps) => (
-    <div
-      className={cn(
-        "flex flex-1 items-center gap-2 overflow-hidden",
-        className,
-      )}
-      {...props}
-    >
-      <AlertTriangleIcon className="size-4 shrink-0 text-destructive" />
-      {children}
-    </div>
-  ),
-);
+export const StackTraceError = memo(({ className, children, ...props }: StackTraceErrorProps) => (
+  <div className={cn("flex flex-1 items-center gap-2 overflow-hidden", className)} {...props}>
+    <AlertTriangleIcon className="size-4 shrink-0 text-destructive" />
+    {children}
+  </div>
+));
 
 export type StackTraceErrorTypeProps = ComponentProps<"span">;
 
@@ -256,10 +237,7 @@ export const StackTraceErrorType = memo(
     const { trace } = useStackTrace();
 
     return (
-      <span
-        className={cn("shrink-0 font-semibold text-destructive", className)}
-        {...props}
-      >
+      <span className={cn("shrink-0 font-semibold text-destructive", className)} {...props}>
         {children ?? trace.errorType}
       </span>
     );
@@ -332,12 +310,8 @@ export const StackTraceCopyButton = memo(
         await navigator.clipboard.writeText(raw);
         setIsCopied(true);
         onCopy?.();
-        timeoutRef.current = window.setTimeout(
-          () => setIsCopied(false),
-          timeout,
-        );
-      }
-      catch (error) {
+        timeoutRef.current = window.setTimeout(() => setIsCopied(false), timeout);
+      } catch (error) {
         onError?.(error as Error);
       }
     }, [raw, onCopy, onError, timeout]);
@@ -372,10 +346,7 @@ export const StackTraceExpandButton = memo(
     const { isOpen } = useStackTrace();
 
     return (
-      <div
-        className={cn("flex size-7 items-center justify-center", className)}
-        {...props}
-      >
+      <div className={cn("flex size-7 items-center justify-center", className)} {...props}>
         <ChevronDownIcon
           className={cn(
             "size-4 text-muted-foreground transition-transform",
@@ -387,19 +358,12 @@ export const StackTraceExpandButton = memo(
   },
 );
 
-export type StackTraceContentProps = ComponentProps<
-  typeof CollapsibleContent
-> & {
+export type StackTraceContentProps = ComponentProps<typeof CollapsibleContent> & {
   maxHeight?: number;
 };
 
 export const StackTraceContent = memo(
-  ({
-    className,
-    maxHeight = 400,
-    children,
-    ...props
-  }: StackTraceContentProps) => {
+  ({ className, maxHeight = 400, children, ...props }: StackTraceContentProps) => {
     const { isOpen } = useStackTrace();
 
     return (
@@ -426,83 +390,67 @@ export type StackTraceFramesProps = ComponentProps<"div"> & {
 
 interface FilePathButtonProps {
   frame: StackFrame;
-  onFilePathClick?: (
-    filePath: string,
-    lineNumber?: number,
-    columnNumber?: number,
-  ) => void;
+  onFilePathClick?: (filePath: string, lineNumber?: number, columnNumber?: number) => void;
 }
 
-const FilePathButton = memo(
-  ({ frame, onFilePathClick }: FilePathButtonProps) => {
-    const handleClick = useCallback(() => {
-      if (frame.filePath) {
-        onFilePathClick?.(
-          frame.filePath,
-          frame.lineNumber ?? undefined,
-          frame.columnNumber ?? undefined,
-        );
-      }
-    }, [frame, onFilePathClick]);
+const FilePathButton = memo(({ frame, onFilePathClick }: FilePathButtonProps) => {
+  const handleClick = useCallback(() => {
+    if (frame.filePath) {
+      onFilePathClick?.(
+        frame.filePath,
+        frame.lineNumber ?? undefined,
+        frame.columnNumber ?? undefined,
+      );
+    }
+  }, [frame, onFilePathClick]);
 
-    return (
-      <button
-        className={cn(
-          "underline decoration-dotted hover:text-primary",
-          onFilePathClick && "cursor-pointer",
-        )}
-        disabled={!onFilePathClick}
-        onClick={handleClick}
-        type="button"
-      >
-        {frame.filePath}
-        {frame.lineNumber !== null && `:${frame.lineNumber}`}
-        {frame.columnNumber !== null && `:${frame.columnNumber}`}
-      </button>
-    );
-  },
-);
+  return (
+    <button
+      className={cn(
+        "underline decoration-dotted hover:text-primary",
+        onFilePathClick && "cursor-pointer",
+      )}
+      disabled={!onFilePathClick}
+      onClick={handleClick}
+      type="button"
+    >
+      {frame.filePath}
+      {frame.lineNumber !== null && `:${frame.lineNumber}`}
+      {frame.columnNumber !== null && `:${frame.columnNumber}`}
+    </button>
+  );
+});
 
 FilePathButton.displayName = "FilePathButton";
 
 export const StackTraceFrames = memo(
-  ({
-    className,
-    showInternalFrames = true,
-    ...props
-  }: StackTraceFramesProps) => {
+  ({ className, showInternalFrames = true, ...props }: StackTraceFramesProps) => {
     const { trace, onFilePathClick } = useStackTrace();
 
     const framesToShow = showInternalFrames
       ? trace.frames
-      : trace.frames.filter(f => !f.isInternal);
+      : trace.frames.filter((f) => !f.isInternal);
 
     return (
       <div className={cn("space-y-1 p-3", className)} {...props}>
-        {framesToShow.map(frame => (
+        {framesToShow.map((frame) => (
           <div
             className={cn(
               "text-xs",
-              frame.isInternal
-                ? "text-muted-foreground/50"
-                : "text-foreground/90",
+              frame.isInternal ? "text-muted-foreground/50" : "text-foreground/90",
             )}
             key={frame.raw}
           >
             <span className="text-muted-foreground">at </span>
             {frame.functionName && (
               <span className={frame.isInternal ? "" : "text-foreground"}>
-                {frame.functionName}
-                {" "}
+                {frame.functionName}{" "}
               </span>
             )}
             {frame.filePath && (
               <>
                 <span className="text-muted-foreground">(</span>
-                <FilePathButton
-                  frame={frame}
-                  onFilePathClick={onFilePathClick}
-                />
+                <FilePathButton frame={frame} onFilePathClick={onFilePathClick} />
                 <span className="text-muted-foreground">)</span>
               </>
             )}

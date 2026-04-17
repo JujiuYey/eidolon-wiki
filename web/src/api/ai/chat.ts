@@ -86,15 +86,13 @@ export async function chatStream(
           try {
             const event = JSON.parse(data) as StreamChunkEvent;
             onMessage(event);
-          }
-          catch {
+          } catch {
             console.warn("Failed to parse SSE data:", data);
           }
         }
       }
     }
-  }
-  catch (error) {
+  } catch (error) {
     onError?.(error instanceof Error ? error : new Error(String(error)));
   }
 }

@@ -24,7 +24,7 @@ export function useFormatPainter(editor: Editor | null) {
       return;
     }
 
-    setFormatPainter(prev => ({
+    setFormatPainter((prev) => ({
       ...prev,
       savedStyle: readRangeStyle(editor),
     }));
@@ -39,14 +39,14 @@ export function useFormatPainter(editor: Editor | null) {
   }, [editor, formatPainter.savedStyle]);
 
   const activateFormatPainter = useCallback(() => {
-    setFormatPainter(prev => ({
+    setFormatPainter((prev) => ({
       ...prev,
       isActive: true,
     }));
   }, []);
 
   const deactivateFormatPainter = useCallback(() => {
-    setFormatPainter(prev => ({
+    setFormatPainter((prev) => ({
       ...prev,
       isActive: false,
       isLocked: false,
@@ -54,7 +54,7 @@ export function useFormatPainter(editor: Editor | null) {
   }, []);
 
   const toggleFormatPainterLock = useCallback(() => {
-    setFormatPainter(prev => ({
+    setFormatPainter((prev) => ({
       ...prev,
       isLocked: !prev.isLocked,
     }));
@@ -70,7 +70,13 @@ export function useFormatPainter(editor: Editor | null) {
     if (!formatPainter.isLocked) {
       deactivateFormatPainter();
     }
-  }, [applyCapturedStyle, deactivateFormatPainter, formatPainter.isActive, formatPainter.isLocked, formatPainter.savedStyle]);
+  }, [
+    applyCapturedStyle,
+    deactivateFormatPainter,
+    formatPainter.isActive,
+    formatPainter.isLocked,
+    formatPainter.savedStyle,
+  ]);
 
   useEffect(() => {
     if (!editor || !formatPainter.isActive) {
@@ -117,16 +123,19 @@ export function useFormatPainter(editor: Editor | null) {
     activateFormatPainter();
   }, [activateFormatPainter, captureStyle, deactivateFormatPainter, formatPainter.isActive]);
 
-  const handleDoubleClick = useCallback((event: ReactMouseEvent) => {
-    event.preventDefault();
+  const handleDoubleClick = useCallback(
+    (event: ReactMouseEvent) => {
+      event.preventDefault();
 
-    if (!formatPainter.isActive) {
-      captureStyle();
-      activateFormatPainter();
-    }
+      if (!formatPainter.isActive) {
+        captureStyle();
+        activateFormatPainter();
+      }
 
-    toggleFormatPainterLock();
-  }, [activateFormatPainter, captureStyle, formatPainter.isActive, toggleFormatPainterLock]);
+      toggleFormatPainterLock();
+    },
+    [activateFormatPainter, captureStyle, formatPainter.isActive, toggleFormatPainterLock],
+  );
 
   return {
     formatPainter,

@@ -50,38 +50,29 @@ const RESOURCE_PATH = "/api/system/department";
 // 部门相关 API
 export const departmentApi = {
   // 获取部门详情
-  findOne: (id: string) =>
-    request.get<Department>(`${RESOURCE_PATH}/${id}`),
+  findOne: (id: string) => request.get<Department>(`${RESOURCE_PATH}/${id}`),
 
   // 获取树形结构的部门列表
-  tree: () =>
-    request.get<Department[]>(`${RESOURCE_PATH}/tree`),
+  tree: () => request.get<Department[]>(`${RESOURCE_PATH}/tree`),
 
   // 创建部门
-  create: (data: CreateDepartmentRequest) =>
-    request.post<Department>(RESOURCE_PATH, data),
+  create: (data: CreateDepartmentRequest) => request.post<Department>(RESOURCE_PATH, data),
 
   // 更新部门
-  update: (data: UpdateDepartmentRequest) =>
-    request.put<Department>(`${RESOURCE_PATH}`, data),
+  update: (data: UpdateDepartmentRequest) => request.put<Department>(`${RESOURCE_PATH}`, data),
 
   // 删除部门
-  delete: (id: string) =>
-    request.delete(`${RESOURCE_PATH}/${id}`),
+  delete: (id: string) => request.delete(`${RESOURCE_PATH}/${id}`),
 
   // 获取子部门
-  findChildren: (id: string) =>
-    request.get<Department[]>(`${RESOURCE_PATH}/${id}/children`),
+  findChildren: (id: string) => request.get<Department[]>(`${RESOURCE_PATH}/${id}/children`),
 
   // 获取部门选项
-  findOptions: () =>
-    request.get<Option[]>(`${RESOURCE_PATH}/options`),
+  findOptions: () => request.get<Option[]>(`${RESOURCE_PATH}/options`),
 
   // 获取部门下的用户列表
-  findUsers: (id: string) =>
-    request.get<User[]>(`${RESOURCE_PATH}/${id}/users`),
+  findUsers: (id: string) => request.get<User[]>(`${RESOURCE_PATH}/${id}/users`),
 
   // 搜索用户和部门
-  search: (q: string) =>
-    request.get<SearchResult>(`${RESOURCE_PATH}/search`, { params: { q } }),
+  search: (q: string) => request.get<SearchResult>(`${RESOURCE_PATH}/search`, { params: { q } }),
 };

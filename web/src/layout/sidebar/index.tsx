@@ -14,11 +14,7 @@ import avatarImage3 from "@/assets/user-avatar/avatar3.jpg";
 import avatarImage4 from "@/assets/user-avatar/avatar4.jpg";
 import avatarImage5 from "@/assets/user-avatar/avatar5.jpg";
 import avatarImage6 from "@/assets/user-avatar/avatar6.jpg";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/stores/auth";
 
 import { Logo } from "./_components/logo";
@@ -80,7 +76,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const user = useAuthStore(state => state.user);
+  const user = useAuthStore((state) => state.user);
 
   const defaultUser = {
     name: "未登录",

@@ -4,19 +4,8 @@ import { toast } from "sonner";
 
 import { authApi } from "@/api/auth/auth";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/stores/auth";
 
@@ -39,12 +28,10 @@ export function LoginForm() {
       setUser(response.user);
       toast.success("登录成功");
       navigate({ to: "/" });
-    }
-    catch (error) {
+    } catch (error) {
       const message = error instanceof Error ? error.message : "登录失败";
       toast.error("登录失败", { description: message });
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -53,9 +40,7 @@ export function LoginForm() {
       <Card>
         <CardHeader>
           <CardTitle>登录</CardTitle>
-          <CardDescription>
-            请输入您的邮箱登录
-          </CardDescription>
+          <CardDescription>请输入您的邮箱登录</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -72,11 +57,7 @@ export function LoginForm() {
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel
-                    htmlFor="password"
-                  >
-                    密码
-                  </FieldLabel>
+                  <FieldLabel htmlFor="password">密码</FieldLabel>
                   <a
                     href="#"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
@@ -97,9 +78,7 @@ export function LoginForm() {
                   {isLoading ? "登录中..." : "登录"}
                 </Button>
                 <FieldDescription className="text-center">
-                  没有账号？
-                  {" "}
-                  <a href="#">注册</a>
+                  没有账号？ <a href="#">注册</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

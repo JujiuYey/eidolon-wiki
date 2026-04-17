@@ -1,5 +1,4 @@
 import "./editor.css";
-
 import { getRouteApi } from "@tanstack/react-router";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Color from "@tiptap/extension-color";
@@ -143,7 +142,12 @@ export function CanvasTiptapPage() {
 
     const loadContent = async () => {
       const response = await documentApi.getContent(docId);
-      console.log("[Editor] loadContent: received content length=", response.content?.length, "first 100 chars:", response.content?.substring(0, 100));
+      console.log(
+        "[Editor] loadContent: received content length=",
+        response.content?.length,
+        "first 100 chars:",
+        response.content?.substring(0, 100),
+      );
       if (!cancelled) {
         setContent(response.content);
         setDocTitle(response.filename?.replace(/\.[^.]+$/, "") || "文档");
@@ -211,23 +215,30 @@ export function CanvasTiptapPage() {
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <EditorCatalog
           open={catalogOpen}
-          onToggle={() => setCatalogOpen(open => !open)}
+          onToggle={() => setCatalogOpen((open) => !open)}
           editor={editor}
         />
 
         <ScrollArea className="flex-1 bg-[#f5f5f5] p-6">
           <div
             className="mx-auto bg-white shadow-sm"
-            style={{
-              width: `${pageSetup.paperSize.width}px`,
-              zoom: pageSetup.zoom,
-              paddingTop: `${pageSetup.margins.top}px`,
-              paddingBottom: `${pageSetup.margins.bottom}px`,
-              paddingLeft: `${pageSetup.margins.left}px`,
-              paddingRight: `${pageSetup.margins.right}px`,
-            } as React.CSSProperties}
+            style={
+              {
+                width: `${pageSetup.paperSize.width}px`,
+                zoom: pageSetup.zoom,
+                paddingTop: `${pageSetup.margins.top}px`,
+                paddingBottom: `${pageSetup.margins.bottom}px`,
+                paddingLeft: `${pageSetup.margins.left}px`,
+                paddingRight: `${pageSetup.margins.right}px`,
+              } as React.CSSProperties
+            }
           >
-            <TiptapEditor content={content} onChange={handleContentChange} onEditorReady={setEditor} pageSetup={pageSetup} />
+            <TiptapEditor
+              content={content}
+              onChange={handleContentChange}
+              onEditorReady={setEditor}
+              pageSetup={pageSetup}
+            />
           </div>
         </ScrollArea>
       </div>

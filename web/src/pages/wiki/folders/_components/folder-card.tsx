@@ -63,9 +63,7 @@ export function FolderCard({ folder, onEdit, onDelete, onPermission, onEnter }: 
         <div className="flex-1 min-w-0">
           <h3 className="font-medium truncate">{folder.name}</h3>
           {folder.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-              {folder.description}
-            </p>
+            <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{folder.description}</p>
           )}
         </div>
       </div>
@@ -90,10 +88,7 @@ export function FolderCard({ folder, onEdit, onDelete, onPermission, onEnter }: 
             权限设置
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={handleDelete}
-            className="text-destructive"
-          >
+          <DropdownMenuItem onClick={handleDelete} className="text-destructive">
             <IconTrash className="mr-2 h-4 w-4" />
             删除
           </DropdownMenuItem>

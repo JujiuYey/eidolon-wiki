@@ -33,10 +33,7 @@ interface DataTableProps<T> {
   pagination?: PaginationProps;
   onRowClick?: (row: T) => void;
   rowClassName?: (row: T) => string;
-  tableOptions?: Omit<
-    Partial<TableOptions<T>>,
-    "data" | "columns" | "getCoreRowModel"
-  >;
+  tableOptions?: Omit<Partial<TableOptions<T>>, "data" | "columns" | "getCoreRowModel">;
 }
 
 export function DataTable<T>({
@@ -49,9 +46,7 @@ export function DataTable<T>({
   rowClassName,
   tableOptions,
 }: DataTableProps<T>) {
-  const totalPages = pagination
-    ? Math.ceil(pagination.total / pagination.pageSize)
-    : 0;
+  const totalPages = pagination ? Math.ceil(pagination.total / pagination.pageSize) : 0;
 
   const table = useReactTable({
     data,
@@ -69,67 +64,50 @@ export function DataTable<T>({
       <div className="overflow-hidden rounded-lg border">
         <Table>
           <TableHeader className="bg-muted sticky top-0 z-10">
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
+                {headerGroup.headers.map((header) => (
                   <TableHead key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {loading
-              ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                      {columns.map((_, j) => (
-                        <TableCell key={j} className="py-4">
-                          <div className="h-4 w-20 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                )
-              : table.getRowModel().rows?.length
-                ? (
-                    table.getRowModel().rows.map(row => (
-                      <TableRow
-                        key={row.id}
-                        className={rowClassName?.(row.original)}
-                        onClick={
-                          onRowClick
-                            ? () => onRowClick(row.original)
-                            : undefined
-                        }
-                      >
-                        {row.getVisibleCells().map(cell => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  )
-                : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
-                      >
-                        {emptyText}
-                      </TableCell>
-                    </TableRow>
-                  )}
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  {columns.map((_, j) => (
+                    <TableCell key={j} className="py-4">
+                      <div className="h-4 w-20 animate-pulse rounded bg-muted" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  className={rowClassName?.(row.original)}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  {emptyText}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

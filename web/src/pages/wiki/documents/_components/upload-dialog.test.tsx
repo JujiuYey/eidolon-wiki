@@ -80,13 +80,7 @@ describe("UploadDialog", () => {
     listMock.mockResolvedValue([]);
     treeMock.mockResolvedValue([]);
 
-    render(
-      <UploadDialog
-        open
-        onOpenChange={vi.fn()}
-        folderTree={providedTree}
-      />,
-    );
+    render(<UploadDialog open onOpenChange={vi.fn()} folderTree={providedTree} />);
 
     fireEvent.click(screen.getByRole("combobox"));
 
@@ -103,12 +97,7 @@ describe("UploadDialog", () => {
     listMock.mockResolvedValue([]);
     treeMock.mockResolvedValue(fetchedTree);
 
-    render(
-      <UploadDialog
-        open
-        onOpenChange={vi.fn()}
-      />,
-    );
+    render(<UploadDialog open onOpenChange={vi.fn()} />);
 
     await waitFor(() => {
       expect(treeMock).toHaveBeenCalledTimes(1);

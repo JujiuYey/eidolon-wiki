@@ -77,28 +77,24 @@ function TreeSelectBranch<T extends TreeSelectNode<T>>({
                 }
               }}
             >
-              {hasChildren
-                ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleExpand(item.value);
-                      }}
-                      className="p-0.5 hover:bg-accent rounded-sm"
-                    >
-                      {isExpanded
-                        ? (
-                            <ChevronDown className="size-3.5" />
-                          )
-                        : (
-                            <ChevronRight className="size-3.5" />
-                          )}
-                    </button>
-                  )
-                : (
-                    <span className="size-3.5" />
+              {hasChildren ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleExpand(item.value);
+                  }}
+                  className="p-0.5 hover:bg-accent rounded-sm"
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="size-3.5" />
+                  ) : (
+                    <ChevronRight className="size-3.5" />
                   )}
+                </button>
+              ) : (
+                <span className="size-3.5" />
+              )}
               <span className="truncate">{item.label}</span>
               {isSelected && (
                 <span className="absolute right-2 flex size-3.5 items-center justify-center">
@@ -156,8 +152,7 @@ export function TreeSelect<T extends TreeSelectNode<T>>({
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
-      }
-      else {
+      } else {
         next.add(id);
       }
       return next;
@@ -232,24 +227,20 @@ export function TreeSelect<T extends TreeSelectNode<T>>({
             {items.length > 0 && <div className="bg-border my-1 h-px" />}
           </>
         )}
-        {items.length === 0
-          ? (
-              <div className="py-6 text-center text-sm text-muted-foreground">
-                {emptyMessage}
-              </div>
-            )
-          : (
-              <div role="tree" aria-label={placeholder}>
-                <TreeSelectBranch
-                  items={items}
-                  level={0}
-                  selectedValue={value}
-                  onSelect={handleSelect}
-                  expandedIds={expandedIds}
-                  onToggleExpand={toggleExpand}
-                />
-              </div>
-            )}
+        {items.length === 0 ? (
+          <div className="py-6 text-center text-sm text-muted-foreground">{emptyMessage}</div>
+        ) : (
+          <div role="tree" aria-label={placeholder}>
+            <TreeSelectBranch
+              items={items}
+              level={0}
+              selectedValue={value}
+              onSelect={handleSelect}
+              expandedIds={expandedIds}
+              onToggleExpand={toggleExpand}
+            />
+          </div>
+        )}
       </PopoverContent>
     </Popover>
   );

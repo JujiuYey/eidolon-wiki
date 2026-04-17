@@ -5,7 +5,10 @@ import type { ToolbarContextValue } from "../../../_shared/const";
 import { DEFAULT_RANGE_STYLE } from "../../../_shared/const";
 import { readRangeStyle } from "../../../_shared/range-style";
 
-export function useEditorToolbarState(editor: Editor | null, docTitle: string): ToolbarContextValue {
+export function useEditorToolbarState(
+  editor: Editor | null,
+  docTitle: string,
+): ToolbarContextValue {
   const [styleVersion, setStyleVersion] = useState(0);
 
   const rangeStyle = useMemo(() => {
@@ -19,7 +22,7 @@ export function useEditorToolbarState(editor: Editor | null, docTitle: string): 
     }
 
     const updateStyle = () => {
-      setStyleVersion(current => current + 1);
+      setStyleVersion((current) => current + 1);
     };
 
     editor.on?.("selectionUpdate", updateStyle);

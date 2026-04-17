@@ -2,7 +2,13 @@ import { IconFile, IconFolder } from "@tabler/icons-react";
 
 import type { Document } from "@/api/wiki/document";
 import type { Folder } from "@/api/wiki/folder";
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 import { DocumentCard } from "./document-card";
 import { FolderCard } from "./folder-card";
@@ -82,12 +88,10 @@ export function ItemGrid({
         <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
             <IconFolder className="h-4 w-4" />
-            文件夹 (
-            {displayFolders.length}
-            )
+            文件夹 ({displayFolders.length})
           </h3>
           <div className={folderGridClassName}>
-            {displayFolders.map(folder => (
+            {displayFolders.map((folder) => (
               <FolderCard
                 key={folder.id}
                 folder={folder}
@@ -106,12 +110,10 @@ export function ItemGrid({
         <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
             <IconFile className="h-4 w-4" />
-            文档 (
-            {displayDocuments.length}
-            )
+            文档 ({displayDocuments.length})
           </h3>
           <div className={documentGridClassName}>
-            {displayDocuments.map(doc => (
+            {displayDocuments.map((doc) => (
               <DocumentCard
                 key={doc.id}
                 document={doc}

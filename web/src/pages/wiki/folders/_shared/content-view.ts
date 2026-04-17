@@ -24,8 +24,10 @@ function normalizeKeyword(value: string) {
 }
 
 function matchesFolder(folder: Folder, keyword: string) {
-  return folder.name.toLowerCase().includes(keyword)
-    || (folder.description || "").toLowerCase().includes(keyword);
+  return (
+    folder.name.toLowerCase().includes(keyword) ||
+    (folder.description || "").toLowerCase().includes(keyword)
+  );
 }
 
 function matchesDocument(document: Document, keyword: string) {
@@ -40,11 +42,11 @@ export function getFolderContentView({
   const keyword = normalizeKeyword(searchKeyword);
 
   const filteredFolders = keyword
-    ? folders.filter(folder => matchesFolder(folder, keyword))
+    ? folders.filter((folder) => matchesFolder(folder, keyword))
     : folders;
 
   const filteredDocuments = keyword
-    ? documents.filter(document => matchesDocument(document, keyword))
+    ? documents.filter((document) => matchesDocument(document, keyword))
     : documents;
 
   return {

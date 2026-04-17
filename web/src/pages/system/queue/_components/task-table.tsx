@@ -66,10 +66,7 @@ export function TaskTable({
         header: "重试次数",
         cell: ({ row }) => (
           <span>
-            {row.original.retried}
-            {" "}
-            /
-            {row.original.max_retry}
+            {row.original.retried} /{row.original.max_retry}
           </span>
         ),
       });
@@ -80,9 +77,7 @@ export function TaskTable({
         accessorKey: "state",
         header: "状态",
         cell: ({ row }) => (
-          <Badge variant={getStateBadgeVariant(row.original.state)}>
-            {row.original.state}
-          </Badge>
+          <Badge variant={getStateBadgeVariant(row.original.state)}>{row.original.state}</Badge>
         ),
       });
     }
@@ -104,9 +99,7 @@ export function TaskTable({
         accessorKey: "next_process",
         header: "下次执行",
         cell: ({ row }) => (
-          <span className="text-xs text-muted-foreground">
-            {row.original.next_process || "-"}
-          </span>
+          <span className="text-xs text-muted-foreground">{row.original.next_process || "-"}</span>
         ),
       });
     }
@@ -120,16 +113,18 @@ export function TaskTable({
       data={tasks}
       loading={loading}
       emptyText="暂无任务"
-      pagination={total > 0
-        ? {
-            page,
-            pageSize,
-            total,
-            pageSizeOptions: [10, 20, 30, 50],
-            onPageChange,
-            onPageSizeChange,
-          }
-        : undefined}
+      pagination={
+        total > 0
+          ? {
+              page,
+              pageSize,
+              total,
+              pageSizeOptions: [10, 20, 30, 50],
+              onPageChange,
+              onPageSizeChange,
+            }
+          : undefined
+      }
     />
   );
 }

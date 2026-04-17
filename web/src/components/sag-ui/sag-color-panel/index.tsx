@@ -1,5 +1,4 @@
 import "./index.css";
-
 import { useEffect, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 
@@ -114,7 +113,7 @@ export function SagColorPanel({ color, onChange }: SagColorPanelProps) {
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">RGB</div>
             <div className="grid grid-cols-3 gap-2">
-              {(["r", "g", "b"] as const).map(channel => (
+              {(["r", "g", "b"] as const).map((channel) => (
                 <div key={channel} className="space-y-1">
                   <div className="text-[11px] font-medium uppercase text-muted-foreground">
                     {channel}

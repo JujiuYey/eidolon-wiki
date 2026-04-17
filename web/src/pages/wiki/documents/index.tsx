@@ -4,18 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { type Document, documentApi } from "@/api/wiki/document";
-import {
-  folderApi,
-  type FolderTreeNode,
-} from "@/api/wiki/folder";
+import { folderApi, type FolderTreeNode } from "@/api/wiki/folder";
 import { ConfirmDialog } from "@/components/sag-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { FolderTree } from "@/pages/wiki/folders/_components/folder-tree";
 
 import { DocumentDataTable } from "./_components/data-table";
@@ -62,11 +55,9 @@ export function DocumentsPage() {
       });
       setData(res.data || []);
       setTotal(res.total || 0);
-    }
-    catch {
+    } catch {
       toast.error("加载文档列表失败");
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   }, [activeKbId, page, pageSize, searchKeyword]);
@@ -81,8 +72,7 @@ export function DocumentsPage() {
     try {
       const res = await folderApi.tree();
       setFolderTreeData(res || []);
-    }
-    catch {
+    } catch {
       toast.error("加载文件夹树失败");
     }
   }, []);
@@ -126,15 +116,14 @@ export function DocumentsPage() {
   const handleProcess = async (doc: Document) => {
     if (processingIds.has(doc.id)) return;
 
-    setProcessingIds(prev => new Set(prev).add(doc.id));
+    setProcessingIds((prev) => new Set(prev).add(doc.id));
     try {
       await documentApi.process(doc.id);
       toast.success("处理任务已启动", {
         description: `${doc.filename} 正在处理中`,
       });
       loadDocuments();
-    }
-    catch {
+    } catch {
       setProcessingIds((prev) => {
         const next = new Set(prev);
         next.delete(doc.id);
@@ -147,18 +136,16 @@ export function DocumentsPage() {
   const handleDownload = async (doc: Document) => {
     if (downloadingIds.has(doc.id)) return;
 
-    setDownloadingIds(prev => new Set(prev).add(doc.id));
+    setDownloadingIds((prev) => new Set(prev).add(doc.id));
     try {
       const res = await documentApi.download(doc.id);
       window.open(res.download_url, "_blank");
       toast.success("下载已开始", {
         description: `${doc.filename} 下载链接已生成`,
       });
-    }
-    catch {
+    } catch {
       // 错误已在拦截器中处理
-    }
-    finally {
+    } finally {
       setDownloadingIds((prev) => {
         const next = new Set(prev);
         next.delete(doc.id);
@@ -180,18 +167,14 @@ export function DocumentsPage() {
         description: `${deleteTarget.filename} 已被删除`,
       });
       loadDocuments();
-    }
-    catch {
+    } catch {
       // 错误已在拦截器中处理
     }
   };
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <ResizablePanelGroup
-        orientation="horizontal"
-        className="min-h-0 flex-1 overflow-hidden"
-      >
+      <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1 overflow-hidden">
         {/* 左侧文件夹树形导航 */}
         <ResizablePanel
           id="folder-tree-panel"
@@ -200,11 +183,7 @@ export function DocumentsPage() {
           maxSize="30%"
           className="min-w-0 overflow-y-auto"
         >
-          <FolderTree
-            data={folderTreeData}
-            selectedId={activeKbId}
-            onSelect={handleTreeSelect}
-          />
+          <FolderTree data={folderTreeData} selectedId={activeKbId} onSelect={handleTreeSelect} />
         </ResizablePanel>
 
         <ResizableHandle withHandle />
@@ -216,82 +195,78 @@ export function DocumentsPage() {
           minSize="50%"
           className="min-w-0 overflow-y-auto"
         >
-          {!activeKbId
-            ? (
-                <div className="h-full flex items-center justify-center">
-                  <div className="text-center space-y-4 max-w-md px-6">
-                    <div className="flex justify-center">
-                      <div className="rounded-full bg-muted p-6">
-                        <IconSearch className="h-12 w-12 text-muted-foreground" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <h2 className="text-2xl font-semibold">请选择知识库</h2>
-                      <p className="text-muted-foreground">
-                        请从左侧选择一个知识库来查看和管理文档
-                      </p>
-                    </div>
+          {!activeKbId ? (
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center space-y-4 max-w-md px-6">
+                <div className="flex justify-center">
+                  <div className="rounded-full bg-muted p-6">
+                    <IconSearch className="h-12 w-12 text-muted-foreground" />
                   </div>
                 </div>
-              )
-            : (
-                <>
-                  {/* 头部 */}
-                  <div className="border-b">
-                    <div className="flex items-center justify-between p-6">
-                      <div>
-                        <h1 className="text-2xl font-bold">文档管理</h1>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          上传和管理您的知识库文档
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" variant="outline" onClick={loadDocuments}>
-                          <IconRefresh className="h-4 w-4" />
-                        </Button>
-                        <Button onClick={() => setUploadOpen(true)}>
-                          <IconUpload className="mr-2 h-4 w-4" />
-                          上传文档
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* 搜索栏 */}
-                    <div className="px-6 pb-4">
-                      <div className="flex gap-2">
-                        <div className="relative flex-1 max-w-sm">
-                          <IconSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            placeholder="搜索文档名称..."
-                            value={searchKeyword}
-                            onChange={e => setSearchKeyword(e.target.value)}
-                            onKeyDown={e => e.key === "Enter" && handleSearch()}
-                            className="pl-9"
-                          />
-                        </div>
-                        <Button onClick={handleSearch}>搜索</Button>
-                      </div>
-                    </div>
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-semibold">请选择知识库</h2>
+                  <p className="text-muted-foreground">请从左侧选择一个知识库来查看和管理文档</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* 头部 */}
+              <div className="border-b">
+                <div className="flex items-center justify-between p-6">
+                  <div>
+                    <h1 className="text-2xl font-bold">文档管理</h1>
+                    <p className="text-sm text-muted-foreground mt-1">上传和管理您的知识库文档</p>
                   </div>
-
-                  {/* 表格 */}
-                  <div className="flex-1 overflow-auto p-6">
-                    <DocumentDataTable
-                      data={data}
-                      loading={loading}
-                      page={page}
-                      pageSize={pageSize}
-                      total={total}
-                      onPageChange={setPage}
-                      onPageSizeChange={handlePageSizeChange}
-                      onProcess={handleProcess}
-                      onDownload={handleDownload}
-                      onDelete={handleDelete}
-                      onEditCanvas={doc => navigate({ to: "/wiki/tiptap-editor", search: { docId: doc.id } })}
-                    />
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" variant="outline" onClick={loadDocuments}>
+                      <IconRefresh className="h-4 w-4" />
+                    </Button>
+                    <Button onClick={() => setUploadOpen(true)}>
+                      <IconUpload className="mr-2 h-4 w-4" />
+                      上传文档
+                    </Button>
                   </div>
-                </>
-              )}
+                </div>
+
+                {/* 搜索栏 */}
+                <div className="px-6 pb-4">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1 max-w-sm">
+                      <IconSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="搜索文档名称..."
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                        className="pl-9"
+                      />
+                    </div>
+                    <Button onClick={handleSearch}>搜索</Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 表格 */}
+              <div className="flex-1 overflow-auto p-6">
+                <DocumentDataTable
+                  data={data}
+                  loading={loading}
+                  page={page}
+                  pageSize={pageSize}
+                  total={total}
+                  onPageChange={setPage}
+                  onPageSizeChange={handlePageSizeChange}
+                  onProcess={handleProcess}
+                  onDownload={handleDownload}
+                  onDelete={handleDelete}
+                  onEditCanvas={(doc) =>
+                    navigate({ to: "/wiki/tiptap-editor", search: { docId: doc.id } })
+                  }
+                />
+              </div>
+            </>
+          )}
         </ResizablePanel>
       </ResizablePanelGroup>
 
@@ -309,7 +284,9 @@ export function DocumentsPage() {
         description={`确定要删除文档"${deleteTarget?.filename}"吗？`}
         confirmText="删除"
         destructive
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
         onConfirm={handleConfirmDelete}
       />
     </div>

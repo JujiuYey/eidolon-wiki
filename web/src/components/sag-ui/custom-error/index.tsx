@@ -24,9 +24,7 @@ export function CustomError({ code, subtitle, error, children }: CustomErrorProp
             <Button variant="outline" onClick={() => window.history.back()}>
               返回
             </Button>
-            <Button onClick={() => navigate({ to: "/" })}>
-              返回首页
-            </Button>
+            <Button onClick={() => navigate({ to: "/" })}>返回首页</Button>
           </div>
         )}
       </footer>

@@ -53,14 +53,16 @@ function createEditorStub() {
       }
       return {};
     }),
-    isActive: vi.fn((nameOrAttrs: string | Record<string, unknown>, attrs?: Record<string, unknown>) => {
-      if (nameOrAttrs === "bold") return true;
-      if (nameOrAttrs === "bulletList") return false;
-      if (nameOrAttrs === "orderedList") return true;
-      if (nameOrAttrs === "heading" && attrs?.level === 2) return true;
-      if (typeof nameOrAttrs === "object" && nameOrAttrs.textAlign === "center") return true;
-      return false;
-    }),
+    isActive: vi.fn(
+      (nameOrAttrs: string | Record<string, unknown>, attrs?: Record<string, unknown>) => {
+        if (nameOrAttrs === "bold") return true;
+        if (nameOrAttrs === "bulletList") return false;
+        if (nameOrAttrs === "orderedList") return true;
+        if (nameOrAttrs === "heading" && attrs?.level === 2) return true;
+        if (typeof nameOrAttrs === "object" && nameOrAttrs.textAlign === "center") return true;
+        return false;
+      },
+    ),
     off: vi.fn(),
     on: vi.fn(),
     state: {

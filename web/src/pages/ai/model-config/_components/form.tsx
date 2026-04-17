@@ -1,23 +1,15 @@
-import {
-  IconDeviceFloppy,
-  IconPlus,
-  IconRefresh,
-  IconStar,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconDeviceFloppy, IconPlus, IconRefresh, IconStar, IconTrash } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
 import type { ModelConfig, ModelType } from "@/api/ai/model-config";
-import { useCreateModelConfig, useSetDefaultModelConfig, useUpdateModelConfig } from "@/api/ai/model-config";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  useCreateModelConfig,
+  useSetDefaultModelConfig,
+  useUpdateModelConfig,
+} from "@/api/ai/model-config";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -30,11 +22,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 
-import {
-  CUSTOM_VENDOR_ID,
-  getProvidersByType,
-  MODEL_TYPES,
-} from "../_shared/const";
+import { CUSTOM_VENDOR_ID, getProvidersByType, MODEL_TYPES } from "../_shared/const";
 
 interface ModelConfigFormProps {
   config: ModelConfig | null;
@@ -46,42 +34,20 @@ interface ModelConfigFormProps {
 // 表单验证 schema
 const formSchema = z.object({
   model_type: z.enum(["chat", "embedding"]),
-  vendor: z
-    .string()
-    .min(1, "请选择厂商"),
-  name: z
-    .string()
-    .min(1, "配置名称不能为空")
-    .max(50, "配置名称不能超过50个字符"),
-  api_key: z
-    .string()
-    .min(1, "API Key 不能为空"),
-  base_url: z
-    .string()
-    .min(1, "Base URL 不能为空"),
-  model: z
-    .string()
-    .min(1, "模型名称不能为空"),
-  temperature: z
-    .number()
-    .min(0, "Temperature 不能小于 0")
-    .max(2, "Temperature 不能大于 2"),
-  top_p: z
-    .number()
-    .min(0, "Top P 不能小于 0")
-    .max(1, "Top P 不能大于 1"),
+  vendor: z.string().min(1, "请选择厂商"),
+  name: z.string().min(1, "配置名称不能为空").max(50, "配置名称不能超过50个字符"),
+  api_key: z.string().min(1, "API Key 不能为空"),
+  base_url: z.string().min(1, "Base URL 不能为空"),
+  model: z.string().min(1, "模型名称不能为空"),
+  temperature: z.number().min(0, "Temperature 不能小于 0").max(2, "Temperature 不能大于 2"),
+  top_p: z.number().min(0, "Top P 不能小于 0").max(1, "Top P 不能大于 1"),
   max_tokens: z
     .number()
     .int("Max Tokens 必须是整数")
     .positive("Max Tokens 必须是正数")
     .optional()
     .nullable(),
-  top_k: z
-    .number()
-    .int("Top K 必须是整数")
-    .positive("Top K 必须是正数")
-    .optional()
-    .nullable(),
+  top_k: z.number().int("Top K 必须是整数").positive("Top K 必须是正数").optional().nullable(),
   is_active: z.boolean(),
   is_default: z.boolean(),
 });
@@ -172,8 +138,7 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
           id: config.id,
           ...data,
         });
-      }
-      else {
+      } else {
         // 创建新配置
         await createMutation.mutateAsync(data);
       }
@@ -186,9 +151,7 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
 
   const isLoading = updateMutation.isPending || createMutation.isPending;
 
-  const isDefault = config
-    ? form.getFieldValue("is_default") ?? false
-    : false;
+  const isDefault = config ? (form.getFieldValue("is_default") ?? false) : false;
 
   // 获取当前模型类型对应的供应商
   const currentModelType = form.getFieldValue("model_type") || "chat";
@@ -202,7 +165,7 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
     return (
       <p className="text-xs text-destructive">
         {errors
-          .map(err => getErrorMessage(err))
+          .map((err) => getErrorMessage(err))
           .filter(Boolean)
           .join(", ")}
       </p>
@@ -216,20 +179,18 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
     const SubmitIcon = isEdit ? IconDeviceFloppy : IconPlus;
     const submitText = isEdit ? "保存配置" : "创建配置";
 
-    const cardHeader = isEdit
-      ? (
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              {isDefault && <IconStar className="h-4 w-4 text-amber-500" />}
-              {config!.name}
-            </CardTitle>
-          </CardHeader>
-        )
-      : (
-          <CardHeader>
-            <CardTitle>新建模型配置</CardTitle>
-          </CardHeader>
-        );
+    const cardHeader = isEdit ? (
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          {isDefault && <IconStar className="h-4 w-4 text-amber-500" />}
+          {config!.name}
+        </CardTitle>
+      </CardHeader>
+    ) : (
+      <CardHeader>
+        <CardTitle>新建模型配置</CardTitle>
+      </CardHeader>
+    );
 
     return (
       <form
@@ -273,18 +234,19 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
                           if (newType === "embedding") {
                             form.setFieldValue("temperature", 0);
                             form.setFieldValue("top_p", 0.9);
-                          }
-                          else {
+                          } else {
                             form.setFieldValue("temperature", 0.7);
                             form.setFieldValue("top_p", 0.9);
                           }
                         }}
                       >
-                        <SelectTrigger className={field.state.meta.errors.length ? "border-destructive" : ""}>
+                        <SelectTrigger
+                          className={field.state.meta.errors.length ? "border-destructive" : ""}
+                        >
                           <SelectValue placeholder="请选择模型类型" />
                         </SelectTrigger>
                         <SelectContent>
-                          {MODEL_TYPES.map(type => (
+                          {MODEL_TYPES.map((type) => (
                             <SelectItem key={type.id} value={type.id}>
                               {type.name}
                             </SelectItem>
@@ -315,7 +277,7 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
                       <Select
                         value={field.state.value}
                         onValueChange={(value) => {
-                          const provider = providers.find(p => p.id === value);
+                          const provider = providers.find((p) => p.id === value);
                           field.handleChange(value);
                           // 自动填充 name 和 base_url
                           if (provider && provider.id !== CUSTOM_VENDOR_ID) {
@@ -324,23 +286,23 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
                             // 如果只有一个模型，直接填充
                             if (provider.models.length === 1) {
                               form.setFieldValue("model", provider.models[0]);
-                            }
-                            else if (provider.models.length > 1) {
+                            } else if (provider.models.length > 1) {
                               form.setFieldValue("model", "");
                             }
-                          }
-                          else {
+                          } else {
                             form.setFieldValue("name", "");
                             form.setFieldValue("base_url", "");
                             form.setFieldValue("model", "");
                           }
                         }}
                       >
-                        <SelectTrigger className={field.state.meta.errors.length ? "border-destructive" : ""}>
+                        <SelectTrigger
+                          className={field.state.meta.errors.length ? "border-destructive" : ""}
+                        >
                           <SelectValue placeholder="请选择厂商" />
                         </SelectTrigger>
                         <SelectContent>
-                          {providers.map(provider => (
+                          {providers.map((provider) => (
                             <SelectItem key={provider.id} value={provider.id}>
                               {provider.name}
                             </SelectItem>
@@ -379,7 +341,11 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
                         field.handleChange(e.target.value);
                       }}
                       onBlur={field.handleBlur}
-                      placeholder={currentModelType === "embedding" ? "例如：OpenAI Embedding" : "例如：OpenAI GPT-4"}
+                      placeholder={
+                        currentModelType === "embedding"
+                          ? "例如：OpenAI Embedding"
+                          : "例如：OpenAI GPT-4"
+                      }
                       className={field.state.meta.errors.length ? "border-destructive" : ""}
                     />
                     {renderErrors(field.state.meta.errors)}
@@ -401,43 +367,44 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
               }}
               children={(field) => {
                 const vendor = form.getFieldValue("vendor");
-                const selectedProvider = providers.find(p => p.id === vendor);
+                const selectedProvider = providers.find((p) => p.id === vendor);
                 const isCustom = vendor === CUSTOM_VENDOR_ID;
                 const hasModels = selectedProvider && selectedProvider.models.length > 0;
 
                 return (
                   <div className="space-y-2">
                     <Label htmlFor={field.name}>模型名称 *</Label>
-                    {isCustom || !hasModels
-                      ? (
-                          <Input
-                            id={field.name}
-                            value={field.state.value}
-                            onChange={(e) => {
-                              field.handleChange(e.target.value);
-                            }}
-                            onBlur={field.handleBlur}
-                            placeholder={currentModelType === "embedding" ? "请输入自定义向量模型名称" : "请输入自定义对话模型名称"}
-                            className={field.state.meta.errors.length ? "border-destructive" : ""}
-                          />
-                        )
-                      : (
-                          <Select
-                            value={field.state.value}
-                            onValueChange={field.handleChange}
-                          >
-                            <SelectTrigger className={field.state.meta.errors.length ? "border-destructive" : ""}>
-                              <SelectValue placeholder="请选择模型" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {selectedProvider.models.map(model => (
-                                <SelectItem key={model} value={model}>
-                                  {model}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
+                    {isCustom || !hasModels ? (
+                      <Input
+                        id={field.name}
+                        value={field.state.value}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
+                        onBlur={field.handleBlur}
+                        placeholder={
+                          currentModelType === "embedding"
+                            ? "请输入自定义向量模型名称"
+                            : "请输入自定义对话模型名称"
+                        }
+                        className={field.state.meta.errors.length ? "border-destructive" : ""}
+                      />
+                    ) : (
+                      <Select value={field.state.value} onValueChange={field.handleChange}>
+                        <SelectTrigger
+                          className={field.state.meta.errors.length ? "border-destructive" : ""}
+                        >
+                          <SelectValue placeholder="请选择模型" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {selectedProvider.models.map((model) => (
+                            <SelectItem key={model} value={model}>
+                              {model}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                     {renderErrors(field.state.meta.errors)}
                   </div>
                 );
@@ -635,9 +602,7 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
                           placeholder="4096"
                           className={field.state.meta.errors.length ? "border-destructive" : ""}
                         />
-                        <p className="text-xs text-muted-foreground">
-                          生成回复的最大token数量限制
-                        </p>
+                        <p className="text-xs text-muted-foreground">生成回复的最大token数量限制</p>
                         {renderErrors(field.state.meta.errors)}
                       </div>
                     );
@@ -705,10 +670,7 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
                           是否启用此配置，只有启用的配置才会被使用
                         </p>
                       </div>
-                      <Switch
-                        checked={field.state.value}
-                        onCheckedChange={field.handleChange}
-                      />
+                      <Switch checked={field.state.value} onCheckedChange={field.handleChange} />
                     </div>
                   );
                 }}
@@ -738,38 +700,38 @@ export function ModelConfigForm({ config, onRefresh, onDelete }: ModelConfigForm
           </CardContent>
 
           <CardFooter className="flex justify-end gap-2">
-            {config && onDelete
-              ? (
-                  <>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setDefaultMutation.mutate(config.id)}
-                      disabled={isDefault || setDefaultMutation.isPending}
-                    >
-                      {setDefaultMutation.isPending
-                        ? (
-                            <Spinner className="mr-2 h-4 w-4" />
-                          )
-                        : (
-                            <IconStar className="mr-2 h-4 w-4" />
-                          )}
-                      {isDefault ? "已是默认" : "设为默认"}
-                    </Button>
-                    <Button type="button" variant="destructive" onClick={onDelete}>
-                      <IconTrash className="mr-2 h-4 w-4" />
-                      删除配置
-                    </Button>
-                  </>
-                )
-              : (
-                  <Button type="button" variant="outline" onClick={() => form.reset()}>
-                    <IconRefresh className="mr-2 h-4 w-4" />
-                    重置
-                  </Button>
-                )}
+            {config && onDelete ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDefaultMutation.mutate(config.id)}
+                  disabled={isDefault || setDefaultMutation.isPending}
+                >
+                  {setDefaultMutation.isPending ? (
+                    <Spinner className="mr-2 h-4 w-4" />
+                  ) : (
+                    <IconStar className="mr-2 h-4 w-4" />
+                  )}
+                  {isDefault ? "已是默认" : "设为默认"}
+                </Button>
+                <Button type="button" variant="destructive" onClick={onDelete}>
+                  <IconTrash className="mr-2 h-4 w-4" />
+                  删除配置
+                </Button>
+              </>
+            ) : (
+              <Button type="button" variant="outline" onClick={() => form.reset()}>
+                <IconRefresh className="mr-2 h-4 w-4" />
+                重置
+              </Button>
+            )}
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? <Spinner className="mr-2 h-4 w-4" /> : <SubmitIcon className="mr-2 h-4 w-4" />}
+              {isSubmitting ? (
+                <Spinner className="mr-2 h-4 w-4" />
+              ) : (
+                <SubmitIcon className="mr-2 h-4 w-4" />
+              )}
               {submitText}
             </Button>
           </CardFooter>

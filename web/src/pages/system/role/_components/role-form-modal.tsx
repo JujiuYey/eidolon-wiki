@@ -51,8 +51,7 @@ export function RoleFormModal({
           name: value.name,
           description: value.description || undefined,
         });
-      }
-      else {
+      } else {
         onSubmit({
           id: role!.id,
           name: value.name,
@@ -92,23 +91,18 @@ export function RoleFormModal({
         >
           <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
             {/* 角色名称 */}
-            <form.Field
-              name="name"
-              validators={{ onChange: roleFormSchema.shape.name }}
-            >
-              {field => (
+            <form.Field name="name" validators={{ onChange: roleFormSchema.shape.name }}>
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="name">
-                    角色名称
-                    {" "}
-                    <span className="text-destructive">*</span>
+                    角色名称 <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="name"
                     placeholder="请输入角色名称"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={e => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs">
@@ -124,7 +118,7 @@ export function RoleFormModal({
               name="description"
               validators={{ onChange: roleFormSchema.shape.description }}
             >
-              {field => (
+              {(field) => (
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="description">描述</Label>
                   <Input
@@ -132,7 +126,7 @@ export function RoleFormModal({
                     placeholder="请输入角色描述（可选）"
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
-                    onChange={e => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs">
@@ -145,11 +139,7 @@ export function RoleFormModal({
           </div>
           <DialogFooter>
             <Button type="submit" disabled={loading}>
-              {loading
-                ? "保存中..."
-                : mode === "create"
-                  ? "创建"
-                  : "保存"}
+              {loading ? "保存中..." : mode === "create" ? "创建" : "保存"}
             </Button>
           </DialogFooter>
         </form>

@@ -27,13 +27,25 @@ const imageExtensions = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "bm
 const audioExtensions = new Set(["mp3", "wav", "m4a", "aac", "flac", "ogg"]);
 const videoExtensions = new Set(["mp4", "mov", "avi", "mkv", "webm"]);
 const markdownExtensions = new Set(["md", "markdown"]);
-const scriptExtensions = new Set(["js", "jsx", "ts", "tsx", "py", "sh", "sql", "json", "yaml", "yml", "toml"]);
+const scriptExtensions = new Set([
+  "js",
+  "jsx",
+  "ts",
+  "tsx",
+  "py",
+  "sh",
+  "sql",
+  "json",
+  "yaml",
+  "yml",
+  "toml",
+]);
 const textExtensions = new Set(["txt"]);
 const archiveExtensions = new Set(["zip", "rar", "7z", "tar", "gz"]);
 
 function getFileExtension(filename: string) {
   const segments = filename.toLowerCase().split(".");
-  return segments.length > 1 ? segments.at(-1) ?? "" : "";
+  return segments.length > 1 ? (segments.at(-1) ?? "") : "";
 }
 
 function matchesExecutable(contentType: string, extension: string) {

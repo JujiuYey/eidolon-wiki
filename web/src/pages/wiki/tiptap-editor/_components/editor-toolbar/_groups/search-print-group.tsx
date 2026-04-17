@@ -11,10 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
+import { exportToDocx } from "../../../_shared/export-docx";
 import { useToolbarContext } from "../_context/toolbar-context";
 import { ToolbarButton } from "../_primitives/toolbar-button";
-
-import { exportToDocx } from "../../../_shared/export-docx";
 
 function getSearchMatches(text: string, query: string) {
   if (!query) {
@@ -86,7 +85,12 @@ export function SearchPrintGroup() {
       return;
     }
 
-    editor?.chain().focus().setTextSelection(match.from, match.to).insertContent(replaceValue).run();
+    editor
+      ?.chain()
+      .focus()
+      .setTextSelection(match.from, match.to)
+      .insertContent(replaceValue)
+      .run();
   };
 
   return (
@@ -129,7 +133,7 @@ export function SearchPrintGroup() {
             <Input
               aria-label="替换内容"
               value={replaceValue}
-              onChange={event => setReplaceValue(event.target.value)}
+              onChange={(event) => setReplaceValue(event.target.value)}
               placeholder="输入替换内容..."
             />
             <div className="flex items-center gap-2">

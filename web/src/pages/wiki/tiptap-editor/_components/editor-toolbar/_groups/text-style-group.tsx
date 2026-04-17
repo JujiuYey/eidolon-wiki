@@ -1,13 +1,13 @@
 import { useEditorState } from "@tiptap/react";
-import {
-  Bold,
-  Code,
-  Italic,
-  Strikethrough,
-  Underline,
-} from "lucide-react";
+import { Bold, Code, Italic, Strikethrough, Underline } from "lucide-react";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { FONT_FAMILIES, FONT_SIZES } from "../../../_shared/const";
 import { useToolbarContext } from "../_context/toolbar-context";
@@ -16,35 +16,40 @@ import { ToolbarButton } from "../_primitives/toolbar-button";
 export function TextStyleGroup() {
   const { editor } = useToolbarContext();
 
-  const {
-    currentFont,
-    currentSize,
-    bold,
-    italic,
-    underline,
-    strikethrough,
-    inlineCode,
-  } = useEditorState({
-    editor,
-    selector: (ctx) => {
-      const currentFont = FONT_FAMILIES.find(f => ctx.editor?.isActive("textStyle", { fontFamily: f.value }));
-      const currentSize = FONT_SIZES.find(s => ctx.editor?.isActive("textStyle", { fontSize: `${s.value}px` }));
-      const bold = ctx.editor?.isActive("bold") ?? false;
-      const italic = ctx.editor?.isActive("italic") ?? false;
-      const underline = ctx.editor?.isActive("underline") ?? false;
-      const strikethrough = ctx.editor?.isActive("strike") ?? false;
-      const inlineCode = ctx.editor?.isActive("code") ?? false;
-      return {
-        currentFont: currentFont?.value ?? "Microsoft YaHei",
-        currentSize: currentSize?.value ?? "16",
-        bold,
-        italic,
-        underline,
-        strikethrough,
-        inlineCode: inlineCode,
-      };
-    },
-  }) ?? { currentFont: "Microsoft YaHei", currentSize: "16", bold: false, italic: false, underline: false, strikethrough: false, inlineCode: false };
+  const { currentFont, currentSize, bold, italic, underline, strikethrough, inlineCode } =
+    useEditorState({
+      editor,
+      selector: (ctx) => {
+        const currentFont = FONT_FAMILIES.find((f) =>
+          ctx.editor?.isActive("textStyle", { fontFamily: f.value }),
+        );
+        const currentSize = FONT_SIZES.find((s) =>
+          ctx.editor?.isActive("textStyle", { fontSize: `${s.value}px` }),
+        );
+        const bold = ctx.editor?.isActive("bold") ?? false;
+        const italic = ctx.editor?.isActive("italic") ?? false;
+        const underline = ctx.editor?.isActive("underline") ?? false;
+        const strikethrough = ctx.editor?.isActive("strike") ?? false;
+        const inlineCode = ctx.editor?.isActive("code") ?? false;
+        return {
+          currentFont: currentFont?.value ?? "Microsoft YaHei",
+          currentSize: currentSize?.value ?? "16",
+          bold,
+          italic,
+          underline,
+          strikethrough,
+          inlineCode: inlineCode,
+        };
+      },
+    }) ?? {
+      currentFont: "Microsoft YaHei",
+      currentSize: "16",
+      bold: false,
+      italic: false,
+      underline: false,
+      strikethrough: false,
+      inlineCode: false,
+    };
 
   return (
     <>
@@ -59,12 +64,8 @@ export function TextStyleGroup() {
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {FONT_FAMILIES.map(f => (
-            <SelectItem
-              key={f.value}
-              value={f.value}
-              style={{ fontFamily: f.value }}
-            >
+          {FONT_FAMILIES.map((f) => (
+            <SelectItem key={f.value} value={f.value} style={{ fontFamily: f.value }}>
               {f.label}
             </SelectItem>
           ))}
@@ -82,11 +83,8 @@ export function TextStyleGroup() {
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {FONT_SIZES.map(s => (
-            <SelectItem
-              key={s.value}
-              value={s.value}
-            >
+          {FONT_SIZES.map((s) => (
+            <SelectItem key={s.value} value={s.value}>
               {s.label}
             </SelectItem>
           ))}
@@ -94,31 +92,29 @@ export function TextStyleGroup() {
       </Select>
 
       <ToolbarButton
-        icon={(
+        icon={
           <span className="text-xs">
-            A
-            <sup>+</sup>
+            A<sup>+</sup>
           </span>
-        )}
+        }
         title="增大字号"
         disabled={!editor}
         onClick={() => {
-          const idx = FONT_SIZES.findIndex(s => s.value === currentSize);
+          const idx = FONT_SIZES.findIndex((s) => s.value === currentSize);
           const prev = FONT_SIZES[idx - 1];
           if (prev) editor?.chain().focus().setFontSize(`${prev.value}px`).run();
         }}
       />
       <ToolbarButton
-        icon={(
+        icon={
           <span className="text-xs">
-            A
-            <sup>-</sup>
+            A<sup>-</sup>
           </span>
-        )}
+        }
         title="减小字号"
         disabled={!editor}
         onClick={() => {
-          const idx = FONT_SIZES.findIndex(s => s.value === currentSize);
+          const idx = FONT_SIZES.findIndex((s) => s.value === currentSize);
           const next = FONT_SIZES[idx + 1];
           if (next) editor?.chain().focus().setFontSize(`${next.value}px`).run();
         }}

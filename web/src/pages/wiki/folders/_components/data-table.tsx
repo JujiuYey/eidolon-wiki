@@ -1,10 +1,4 @@
-import {
-  IconDotsVertical,
-  IconEdit,
-  IconFolder,
-  IconLock,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconDotsVertical, IconEdit, IconFolder, IconLock, IconTrash } from "@tabler/icons-react";
 import { type ColumnDef } from "@tanstack/react-table";
 import * as React from "react";
 
@@ -70,11 +64,7 @@ export function DataTable({
         header: "创建时间",
         cell: ({ row }) => {
           const date = new Date(row.original.created_at);
-          return (
-            <div className="text-muted-foreground">
-              {date.toLocaleString("zh-CN")}
-            </div>
-          );
+          return <div className="text-muted-foreground">{date.toLocaleString("zh-CN")}</div>;
         },
       },
       {
@@ -105,10 +95,7 @@ export function DataTable({
                     权限
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => onDelete?.(folder)}
-                  >
+                  <DropdownMenuItem variant="destructive" onClick={() => onDelete?.(folder)}>
                     <IconTrash />
                     删除
                   </DropdownMenuItem>

@@ -88,8 +88,7 @@ export function sseRequest(options: SSERequestOptions): () => void {
       }
 
       onComplete?.();
-    }
-    catch (error) {
+    } catch (error) {
       if ((error as Error).name === "AbortError") {
         onComplete?.();
         return;
