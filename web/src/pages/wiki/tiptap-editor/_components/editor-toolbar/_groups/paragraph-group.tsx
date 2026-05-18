@@ -13,6 +13,13 @@ const HEADING_OPTIONS = [
   { value: "h4", label: "标题 4" },
 ];
 
+const HEADING_LEVELS = {
+  h1: 1,
+  h2: 2,
+  h3: 3,
+  h4: 4,
+} as const;
+
 function getCurrentHeading(editor: Editor | null) {
   if (editor?.isActive?.("heading", { level: 1 })) return "h1";
   if (editor?.isActive?.("heading", { level: 2 })) return "h2";
@@ -43,7 +50,7 @@ export function ParagraphGroup() {
           editor
             .chain()
             .focus()
-            .toggleHeading({ level: Number(value.slice(1)) })
+            .toggleHeading({ level: HEADING_LEVELS[value as keyof typeof HEADING_LEVELS] })
             .run();
         }}
       />

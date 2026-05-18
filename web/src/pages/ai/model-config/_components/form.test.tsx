@@ -35,6 +35,7 @@ const baseConfig: ModelConfig = {
   name: "Custom Model",
   api_key: "sk-test",
   base_url: "https://example.com/v1",
+  model_type: "chat",
   model: "custom-model-v1",
   temperature: 0.7,
   top_p: 0.9,

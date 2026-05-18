@@ -85,7 +85,7 @@ describe("EditorToolbar", () => {
     const editor = createEditorStub();
     const promptSpy = vi.spyOn(window, "prompt").mockReturnValue("https://example.com");
 
-    render(<EditorToolbar editor={editor as never} onSave={vi.fn()} />);
+    render(<EditorToolbar editor={editor as never} docTitle="测试文档" onSave={vi.fn()} />);
 
     fireEvent.click(screen.getByRole("button", { name: "清除格式" }));
     fireEvent.click(screen.getByRole("button", { name: "粗体" }));
@@ -127,7 +127,7 @@ describe("EditorToolbar", () => {
   it("reflects active paragraph state and applies heading, alignment, and list changes", () => {
     const editor = createEditorStub();
 
-    render(<EditorToolbar editor={editor as never} onSave={vi.fn()} />);
+    render(<EditorToolbar editor={editor as never} docTitle="测试文档" onSave={vi.fn()} />);
 
     const headingSelect = screen.getByRole("combobox", { name: "段落样式" });
     expect(headingSelect).toHaveValue("h2");
@@ -146,7 +146,7 @@ describe("EditorToolbar", () => {
     const editor = createEditorStub();
     const printSpy = vi.spyOn(window, "print").mockImplementation(() => undefined);
 
-    render(<EditorToolbar editor={editor as never} onSave={vi.fn()} />);
+    render(<EditorToolbar editor={editor as never} docTitle="测试文档" onSave={vi.fn()} />);
 
     fireEvent.click(screen.getByRole("button", { name: "搜索" }));
 
@@ -157,14 +157,14 @@ describe("EditorToolbar", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "下一个" }));
     fireEvent.click(screen.getByRole("button", { name: "打印", hidden: true }));
 
-    expect(chainCalls(editor).setTextSelection).toHaveBeenCalledWith(1, 6);
+    expect(chainCalls(editor).setTextSelection).toHaveBeenCalledWith({ from: 1, to: 6 });
     expect(printSpy).toHaveBeenCalledTimes(1);
   });
 
   it("keeps already-active styles intact when applying the format painter", () => {
     const editor = createEditorStub();
 
-    render(<EditorToolbar editor={editor as never} onSave={vi.fn()} />);
+    render(<EditorToolbar editor={editor as never} docTitle="测试文档" onSave={vi.fn()} />);
 
     fireEvent.click(screen.getByRole("button", { name: "格式刷" }));
     editor.getAttributes.mockImplementation((name: string) => {

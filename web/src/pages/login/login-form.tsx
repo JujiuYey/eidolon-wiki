@@ -37,10 +37,10 @@ export function LoginForm() {
   };
   return (
     <div className="flex flex-col gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>登录</CardTitle>
-          <CardDescription>请输入您的邮箱登录</CardDescription>
+      <Card className="border-white/60 bg-white/88 shadow-[0_24px_80px_rgb(15_23_42/0.12)] backdrop-blur dark:border-white/10 dark:bg-card/92">
+        <CardHeader className="space-y-1">
+          <CardTitle>欢迎登录</CardTitle>
+          <CardDescription>请输入账号密码，进入知识运营工作台</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -78,7 +78,7 @@ export function LoginForm() {
                   {isLoading ? "登录中..." : "登录"}
                 </Button>
                 <FieldDescription className="text-center">
-                  没有账号？ <a href="#">注册</a>
+                  使用统一账号登录，登录后可进入知识库、RAG 对话与系统管理。
                 </FieldDescription>
               </Field>
             </FieldGroup>

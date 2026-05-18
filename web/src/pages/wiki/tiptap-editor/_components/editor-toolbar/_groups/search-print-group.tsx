@@ -52,7 +52,7 @@ export function SearchPrintGroup() {
       return;
     }
 
-    editor?.chain().focus().setTextSelection(match.from, match.to).run();
+    editor?.chain().focus().setTextSelection({ from: match.from, to: match.to }).run();
   };
 
   const handleNext = () => {
@@ -88,7 +88,7 @@ export function SearchPrintGroup() {
     editor
       ?.chain()
       .focus()
-      .setTextSelection(match.from, match.to)
+      .setTextSelection({ from: match.from, to: match.to })
       .insertContent(replaceValue)
       .run();
   };

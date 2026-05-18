@@ -26,7 +26,7 @@ export function LayoutComponent() {
   }, [accessToken, user, setUser]);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen>
       <AppSidebar />
       <SidebarInset>
         <Outlet />

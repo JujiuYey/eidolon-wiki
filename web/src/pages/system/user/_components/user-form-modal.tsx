@@ -45,6 +45,25 @@ interface Props {
   onSubmit?: (data: CreateUserRequest | UpdateUserRequest) => void;
 }
 
+function getErrorMessage(errors: unknown[]) {
+  const firstError = errors[0];
+
+  if (typeof firstError === "string") {
+    return firstError;
+  }
+
+  if (
+    firstError &&
+    typeof firstError === "object" &&
+    "message" in firstError &&
+    typeof firstError.message === "string"
+  ) {
+    return firstError.message;
+  }
+
+  return undefined;
+}
+
 export function UserFormModal({
   open,
   mode = "create",
@@ -69,7 +88,7 @@ export function UserFormModal({
       role_ids: [] as string[],
     },
     validators: {
-      onSubmit: schema,
+      onSubmit: schema as never,
     },
     onSubmit: ({ value }) => {
       if (!onSubmit) return;
@@ -144,11 +163,11 @@ export function UserFormModal({
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
-                    {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                    {field.state.meta.isTouched && field.state.meta.errors.length > 0 ? (
                       <p className="text-destructive text-xs">
-                        {field.state.meta.errors[0]?.message}
+                        {getErrorMessage(field.state.meta.errors)}
                       </p>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </form.Field>
@@ -169,11 +188,11 @@ export function UserFormModal({
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
-                  {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                  {field.state.meta.isTouched && field.state.meta.errors.length > 0 ? (
                     <p className="text-destructive text-xs">
-                      {field.state.meta.errors[0]?.message}
+                      {getErrorMessage(field.state.meta.errors)}
                     </p>
-                  )}
+                  ) : null}
                 </div>
               )}
             </form.Field>
@@ -182,7 +201,7 @@ export function UserFormModal({
             {isCreate && (
               <form.Field
                 name="password"
-                validators={{ onChange: createUserFormSchema.shape.password }}
+                validators={{ onChange: createUserFormSchema.shape.password as never }}
               >
                 {(field) => (
                   <div className="flex flex-col gap-3">
@@ -195,11 +214,11 @@ export function UserFormModal({
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
-                    {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                    {field.state.meta.isTouched && field.state.meta.errors.length > 0 ? (
                       <p className="text-destructive text-xs">
-                        {field.state.meta.errors[0]?.message}
+                        {getErrorMessage(field.state.meta.errors)}
                       </p>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </form.Field>
