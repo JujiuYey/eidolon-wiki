@@ -1,0 +1,56 @@
+---
+title: 系统架构
+description: SAG Wiki 的模块边界与文档处理、检索问答链路。
+---
+
+# 系统架构
+
+SAG Wiki 将知识管理、异步文档处理和检索问答拆成明确的服务边界。React 前端只通过 Fiber API 访问业务能力，文档原文件、业务元数据和向量索引分别交给适合的存储系统。
+
+## 运行时组件
+
+| 组件 | 技术 | 职责 |
+| --- | --- | --- |
+| Web | React 19、Vite 7、TanStack Router | 知识库、问答与系统管理界面 |
+| API | Go、Fiber | 鉴权、业务接口和服务编排 |
+| Database | PostgreSQL、Bun | 用户、权限、目录、文档与会话元数据 |
+| Object Storage | MinIO | 原始文档及附件 |
+| Queue | Redis、Asynq | 文档解析与向量化任务 |
+| Vector Store | Qdrant | 文档切片和相似度检索 |
+| AI | Eino、OpenAI-compatible API | Embedding、检索增强与回答生成 |
+
+## 文档入库链路
+
+```text
+上传文档
+   │
+   ├──> MinIO 保存原文件
+   ├──> PostgreSQL 保存文档元数据
+   └──> Redis / Asynq 投递处理任务
+                    │
+                    └──> 解析内容 -> 切片 -> Embedding -> Qdrant
+```
+
+## 检索问答链路
+
+```text
+用户问题
+   │
+   ├──> 根据文件夹权限扩展可检索范围
+   ├──> 生成查询向量
+   ├──> Qdrant 召回相关切片
+   ├──> 组合上下文与模型配置
+   └──> 流式生成回答
+```
+
+## 代码边界
+
+```text
+sag-wiki/
+├── web/       # React 前端应用
+├── server/    # Go API、业务模块与基础设施适配
+├── site/      # Rspress 项目介绍与文档站
+└── docs/      # 设计记录和实现计划
+```
+
+后端按 `app/{domain}` 组织业务模块，公共基础设施放在 `infrastructure/`，HTTP 聚合入口位于 `server/router/router.go`。

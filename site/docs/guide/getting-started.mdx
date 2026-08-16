@@ -1,0 +1,71 @@
+---
+title: 快速开始
+description: 在本地启动 SAG Wiki 的基础设施、Go 服务和 React 前端。
+---
+
+# 快速开始
+
+SAG Wiki 由 Go API、React Web 应用和一组本地基础设施组成。下面的流程会启动 PostgreSQL、Redis、MinIO 与 Qdrant，然后分别运行后端和前端。
+
+## 环境要求
+
+- Go 1.25.3+
+- Node.js 20.19+ 或 22.12+
+- pnpm 10+
+- Docker 与 Docker Compose
+
+## 1. 启动基础设施
+
+在项目根目录执行：
+
+```bash
+docker compose up -d
+```
+
+默认会启动：
+
+| 服务 | 地址 | 用途 |
+| --- | --- | --- |
+| PostgreSQL | `localhost:5432` | 业务数据 |
+| Redis | `localhost:6379` | 异步任务队列 |
+| MinIO | `localhost:9000` | 文档对象存储 |
+| MinIO Console | `localhost:9090` | 存储管理界面 |
+| Qdrant | `localhost:6333` | 向量与切片索引 |
+
+## 2. 启动 Go API
+
+```bash
+cd server
+cp .env.example .env
+go mod download
+go run main.go
+```
+
+API 默认运行在 `http://localhost:8080`。首次启动前，请按本地环境修改 `server/.env`，并确认数据库迁移已经执行。
+
+## 3. 启动 React 应用
+
+新开一个终端：
+
+```bash
+cd web
+cp .env.example .env
+pnpm install
+pnpm dev
+```
+
+Web 应用默认运行在 `http://localhost:5200`。
+
+## 4. 启动介绍站
+
+如需本地预览当前文档站：
+
+```bash
+cd site
+pnpm install
+pnpm dev
+```
+
+## 下一步
+
+阅读[系统架构](./architecture.mdx)，了解一次文档上传如何经过对象存储、任务队列、切片和向量索引，最终参与 RAG 回答。
