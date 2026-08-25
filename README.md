@@ -2,7 +2,7 @@
 
 SAG Wiki 是一个面向团队知识沉淀、检索与问答的可自托管 RAG 工作台。它将目录与权限、文档处理、向量索引、模型配置和检索增强问答放在同一个系统中。
 
-[项目介绍站](https://jujiuyey.github.io/sag-wiki/) · [快速开始](https://jujiuyey.github.io/sag-wiki/guide/getting-started) · [系统架构](https://jujiuyey.github.io/sag-wiki/guide/architecture)
+[项目文档站](https://jujiuyey.github.io/sag-wiki-docs/) · [快速开始](https://jujiuyey.github.io/sag-wiki-docs/guide/getting-started) · [系统架构](https://jujiuyey.github.io/sag-wiki-docs/guide/architecture)
 
 > 项目仍在开发阶段。知识库、文档处理、系统管理和后端 RAG 链路已有实现；部分前端会话数据及 Agent 页面仍包含演示或占位逻辑。
 
@@ -22,7 +22,6 @@ SAG Wiki 是一个面向团队知识沉淀、检索与问答的可自托管 RAG 
 | Web | React 19、TypeScript、Vite 7、TanStack Router / Query、Tailwind CSS 4、Tiptap |
 | API | Go 1.25、Fiber、Bun ORM、Eino |
 | 数据 | PostgreSQL 15、Qdrant、Redis 7、MinIO |
-| 介绍站 | Rspress 2、React、GitHub Pages |
 
 ## 项目结构
 
@@ -41,7 +40,6 @@ sag-wiki/
 │       ├── pages/          # 知识库、AI、系统管理页面
 │       ├── routes/         # TanStack Router 文件路由
 │       └── stores/         # Zustand 状态
-├── site/                   # Rspress 项目介绍与文档站
 ├── docs/                   # 设计记录与实现计划
 └── docker-compose.yml      # 本地基础设施
 ```
@@ -94,14 +92,6 @@ pnpm dev
 
 Web 应用默认运行在 `http://localhost:5200`。
 
-### 4. 启动介绍站
-
-```bash
-cd site
-pnpm install
-pnpm dev
-```
-
 ## 常用命令
 
 ```bash
@@ -115,18 +105,11 @@ pnpm build
 cd server
 go test ./...
 go build ./...
-
-# Rspress 站点
-cd site
-pnpm build
-pnpm preview
 ```
 
-## GitHub Pages
+## 文档站
 
-介绍站由 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) 自动部署。首次使用时，在仓库 `Settings > Pages > Build and deployment` 中将 Source 设为 **GitHub Actions**。之后推送到 `main` 的 `site/` 或部署工作流变更会触发发布。
-
-当前仓库是项目 Pages，Rspress 的 `base` 已配置为 `/sag-wiki/`。如果改用自定义域名，需要同步调整 `site/rspress.config.ts`。
+项目介绍与使用文档维护在独立仓库 [JujiuYey/sag-wiki-docs](https://github.com/JujiuYey/sag-wiki-docs)，站点通过 GitHub Pages 发布。
 
 ## License
 
