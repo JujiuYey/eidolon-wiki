@@ -32,18 +32,31 @@ export function sseRequest(options: SSERequestOptions): () => void {
   } = options;
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const { accessToken } = useAuthStore.getState();
+  const { accessToken } = useAuthStore();
 
   const controller = new AbortController();
   const finalSignal = signal ? signal : controller.signal;
 
-  // 合并 headers，自动添加 token
+  const existingAuth = headers.Authorization ?? headers.authorization;
+  const isEmbedAuth = typeof existingAuth === "string" && existingAuth.startsWith("Embed ");
+  const isEmbedPath = url.includes("/api/v1/embed/");
+
+  // 合并 headers，自动添加参考项目同样的鉴权和请求上下文
   const requestHeaders: Record<string, string> = {
     "Content-Type": "application/json",
+    "Accept-Language": localStorage.getItem("locale") || "zh-CN",
+    "X-Request-ID":
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2),
     ...headers,
   };
-  if (accessToken) {
+  if (accessToken && !isEmbedAuth) {
     requestHeaders.Authorization = `Bearer ${accessToken}`;
+  }
+  if (!isEmbedAuth && !isEmbedPath) {
+    const tenantId = localStorage.getItem("weknora_selected_tenant_id");
+    if (tenantId) requestHeaders["X-Tenant-ID"] = tenantId;
   }
 
   let buffer = "";

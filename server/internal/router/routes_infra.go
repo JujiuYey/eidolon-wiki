@@ -1,0 +1,129 @@
+package router
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/Tencent/WeKnora/internal/handler"
+)
+
+// Models are tenant-wide infrastructure (LLM credentials, embeddings,
+// rerankers); Viewer+ for reads, Admin+ for any mutation. Credential
+// subresource writes are also Admin+ since secrets are tenant-scoped.
+func RegisterModelRoutes(
+	r *gin.RouterGroup,
+	handler *handler.ModelHandler,
+	credHandler *handler.ModelCredentialsHandler,
+	g *rbacGuards,
+) {
+	// 模型路由组。空间级基础设施：仅完全访问（Owner）API key 可访问。
+	models := g.apiKeyGroup(r.Group("/models"), apiKeyManageModels(apiKeyFullAccess()))
+	{
+		// 获取模型厂商列表 — Viewer+
+		models.GET("/providers", g.Viewer(), handler.ListModelProviders)
+		// 解析模型的有效接入配置（协议 / 思考等级 / 上下文）— Viewer+
+		models.GET("/catalog/resolve", g.Viewer(), handler.ResolveModelCatalog)
+		models.POST("/catalog/resolve", g.Viewer(), handler.ResolveModelCatalog)
+		// 创建模型 — Admin+
+		models.POST("", g.Admin(), handler.CreateModel)
+		// 获取模型列表 — Viewer+
+		models.GET("", g.Viewer(), handler.ListModels)
+		// 调试已保存模型会发起真实上游调用并产生费用 — Admin+
+		models.POST("/:id/debug", g.Admin(), handler.DebugModel)
+		// 复制模型配置（含已存凭证）— Admin+
+		models.POST("/:id/copy", g.Admin(), handler.CopyModel)
+		// 获取单个模型 — Viewer+
+		models.GET("/:id", g.Viewer(), handler.GetModel)
+		// 更新模型 — Admin+；内置模型仍由服务层额外限定为 SystemAdmin。
+		models.PUT("/:id", g.AdminOrSystemAdmin(), handler.UpdateModel)
+		// 删除模型 — Admin+
+		models.DELETE("/:id", g.Admin(), handler.DeleteModel)
+		// Per-field credential subresource (see internal/handler/model_credentials.go) — Admin+
+		models.PUT("/:id/credentials", g.AdminOrSystemAdmin(), credHandler.Put)
+		models.DELETE("/:id/credentials/:field", g.AdminOrSystemAdmin(), credHandler.DeleteField)
+	}
+}
+
+func RegisterInitializationRoutes(r *gin.RouterGroup, handler *handler.InitializationHandler, g *rbacGuards) {
+	// 初始化接口
+	// GetCurrentConfigByKB 是只读，Viewer+ 即可（KB 受限 key 可读其范围内的 KB）。
+	g.apiKeyRoute(r, http.MethodGet, "/initialization/config/:kbId",
+		apiKeyRetrieve(apiKeyFullAccess()), g.Viewer(), g.KBAccessRead("kbId"), handler.GetCurrentConfigByKB)
+	// InitializeByKB / UpdateKBConfig 都是改 KB 的核心模型/storage 配置 —
+	// 跟 PUT /knowledge-bases/:id 同等敏感，挂同款 OwnedKB 矩阵 + KBAccessWrite
+	//（API-key 主体短路 Owned* 守卫，KB allow-list 只能靠 KBAccess 兜底）。
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/initialize/:kbId",
+		apiKeyManageKnowledgeBases(apiKeyFullAccess()), g.OwnedKBOrAdminFromKbIDParam(), g.KBAccessWrite("kbId"), handler.InitializeByKB)
+	g.apiKeyRoute(r, http.MethodPut, "/initialization/config/:kbId",
+		apiKeyManageKnowledgeBases(apiKeyFullAccess()), g.OwnedKBOrAdminFromKbIDParam(), g.KBAccessWrite("kbId"), handler.UpdateKBConfig)
+
+	// Ollama / 远程 API / 抽取等系统级检测/下载操作。这些不绑某个 KB，
+	// 会改空间级模型配置或拉远端模型；JWT 侧只读探测 Viewer+、变更 Admin+。
+	// 对 API key 均为空间级：full-access key 可用，scoped key 需要 manage_models。
+	g.apiKeyRoute(r, http.MethodGet, "/initialization/ollama/status", apiKeyManageModels(apiKeyFullAccess()), g.Viewer(), handler.CheckOllamaStatus)
+	g.apiKeyRoute(r, http.MethodGet, "/initialization/ollama/models", apiKeyManageModels(apiKeyFullAccess()), g.Viewer(), handler.ListOllamaModels)
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/ollama/models/check", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.CheckOllamaModels)
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/ollama/models/download", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.DownloadOllamaModel)
+	g.apiKeyRoute(r, http.MethodGet, "/initialization/ollama/download/progress/:taskId", apiKeyManageModels(apiKeyFullAccess()), g.Viewer(), handler.GetDownloadProgress)
+	g.apiKeyRoute(r, http.MethodGet, "/initialization/ollama/download/tasks", apiKeyManageModels(apiKeyFullAccess()), g.Viewer(), handler.ListDownloadTasks)
+
+	// 远程API相关接口
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/remote/check", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.CheckRemoteModel)
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/embedding/test", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.TestEmbeddingModel)
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/rerank/check", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.CheckRerankModel)
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/asr/check", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.CheckASRModel)
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/multimodal/test", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.TestMultimodalFunction)
+
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/extract/text-relation", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.ExtractTextRelations)
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/extract/fabri-tag", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.FabriTag)
+	g.apiKeyRoute(r, http.MethodPost, "/initialization/extract/fabri-text", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.FabriText)
+}
+
+// RegisterVectorStoreRoutes registers CRUD routes for vector store configurations.
+//
+// Vector stores are tenant-level infrastructure; reads are Viewer+, all
+// writes (and connection tests, which probe external systems with stored
+// credentials) are Admin+.
+func RegisterVectorStoreRoutes(r *gin.RouterGroup, h *handler.VectorStoreHandler, g *rbacGuards) {
+	stores := g.apiKeyGroup(r.Group("/vector-stores"), apiKeyManageVectorStores(apiKeyFullAccess()))
+	{
+		// List available engine types (metadata for UI forms) — Viewer+
+		stores.GET("/types", g.Viewer(), h.ListStoreTypes)
+		// Test with raw credentials (no persistence) — Admin+
+		stores.POST("/test", g.Admin(), h.TestStoreRaw)
+		// CRUD
+		stores.POST("", g.Admin(), h.CreateStore)
+		stores.GET("", g.Viewer(), h.ListStores)
+		stores.GET("/:id", g.Viewer(), h.GetStore)
+		stores.PUT("/:id", g.Admin(), h.UpdateStore)
+		stores.DELETE("/:id", g.Admin(), h.DeleteStore)
+		// Test existing saved or env store — Admin+
+		stores.POST("/:id/test", g.Admin(), h.TestStoreByID)
+	}
+}
+
+// RegisterStorageBackendRoutes manages concrete object/file storage instances.
+func RegisterStorageBackendRoutes(r *gin.RouterGroup, h *handler.StorageBackendHandler, g *rbacGuards) {
+	backends := g.apiKeyGroup(r.Group("/storage-backends"), apiKeyManageStorageBackends(apiKeyFullAccess()))
+	{
+		backends.GET("/types", g.Viewer(), h.Types)
+		backends.POST("/test", g.Admin(), h.TestRaw)
+		backends.POST("", g.Admin(), h.Create)
+		backends.GET("", g.Viewer(), h.List)
+		backends.GET("/:id", g.Viewer(), h.Get)
+		backends.PUT("/:id", g.Admin(), h.Update)
+		backends.DELETE("/:id", g.Admin(), h.Delete)
+		backends.POST("/:id/test", g.Admin(), h.TestByID)
+		backends.PUT("/:id/default", g.Admin(), h.SetDefault)
+	}
+}
+
+// RegisterWeKnoraCloudRoutes 注册 WeKnoraCloud 初始化路由
+// RegisterWeKnoraCloudRoutes registers the WeKnoraCloud credential
+// management endpoints. SaveCredentials persists external SaaS keys
+// for the tenant (Admin+), Status is a low-risk readiness probe (Viewer+).
+func RegisterWeKnoraCloudRoutes(r *gin.RouterGroup, handler *handler.WeKnoraCloudHandler, g *rbacGuards) {
+	g.apiKeyRoute(r, http.MethodPost, "/weknoracloud/credentials", apiKeyManageModels(apiKeyFullAccess()), g.Admin(), handler.SaveCredentials)
+	g.apiKeyRoute(r, http.MethodGet, "/models/weknoracloud/status", apiKeyManageModels(apiKeyFullAccess()), g.Viewer(), handler.Status)
+}

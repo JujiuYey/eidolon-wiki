@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+#
+# 本地构建 + 打包 WeKnora Lite 发行包
+#
+# 用法:
+#   ./scripts/package-lite.sh              # 自动检测版本
+#   ./scripts/package-lite.sh v0.2.0       # 指定版本号
+#
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${ROOT_DIR}"
+
+# Resolve version
+if [ -n "${1:-}" ]; then
+    VERSION="$1"
+elif command -v git >/dev/null 2>&1; then
+    VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+else
+    VERSION="dev"
+fi
+
+GOOS=$(go env GOOS)
+GOARCH=$(go env GOARCH)
+ARCHIVE="WeKnora-lite_${VERSION}_${GOOS}_${GOARCH}"
+DIST_DIR="dist/${ARCHIVE}"
+
+echo "=== WeKnora Lite Packager ==="
+echo "  Version : ${VERSION}"
+echo "  Platform: ${GOOS}/${GOARCH}"
+echo "  Output  : dist/${ARCHIVE}.tar.gz"
+echo ""
+
+# ── Step 1: Build Go binary ──
+echo ">> Building WeKnora-lite binary..."
+export EDITION=lite
+eval "$(./scripts/get_version.sh env)"
+LDFLAGS="-w -s $(./scripts/get_version.sh ldflags)"
+export CGO_CFLAGS="-Wno-deprecated-declarations"
+if [ "$(uname)" = "Darwin" ]; then
+    export CGO_LDFLAGS="-Wl,-no_warn_duplicate_libraries"
+fi
+CGO_ENABLED=1 go build -tags "sqlite_fts5" -ldflags="${LDFLAGS}" \
+    -o WeKnora-lite ./cmd/server
+
+# ── Step 2: Assemble package ──
+echo ">> Assembling package..."
+rm -rf "${DIST_DIR}"
+mkdir -p "${DIST_DIR}"
+
+cp WeKnora-lite "${DIST_DIR}/"
+bash ./scripts/copy-licenses.sh "${DIST_DIR}"
+cp .env.lite.example "${DIST_DIR}/"
+# 自建前端可放入 web/ 随包分发（后端静态托管，见 internal/router/static.go）
+if [ -d web ] && [ -f web/index.html ]; then
+    cp -r web "${DIST_DIR}/web"
+fi
+if [ -d config ]; then
+    cp -r config "${DIST_DIR}/config"
+fi
+if [ -d migrations/sqlite ]; then
+    mkdir -p "${DIST_DIR}/migrations/sqlite"
+    cp -r migrations/sqlite/* "${DIST_DIR}/migrations/sqlite/"
+fi
+if [ -f deploy/weknora-lite.service ]; then
+    cp deploy/weknora-lite.service "${DIST_DIR}/"
+fi
+
+# ── Step 3: Create tarball ──
+echo ">> Creating tarball..."
+(cd dist && tar czf "${ARCHIVE}.tar.gz" "${ARCHIVE}")
+(cd dist && shasum -a 256 "${ARCHIVE}.tar.gz" > "${ARCHIVE}.tar.gz.sha256")
+
+echo ""
+echo "=== Done ==="
+echo "  dist/${ARCHIVE}.tar.gz"
+echo "  dist/${ARCHIVE}.tar.gz.sha256"
+SIZE=$(du -h "dist/${ARCHIVE}.tar.gz" | cut -f1)
+echo "  Size: ${SIZE}"

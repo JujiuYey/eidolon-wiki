@@ -1,75 +1,82 @@
-# React + TypeScript + Vite
+# SAG Wiki App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern wiki application with AI-powered features, built with Vue 3, TypeScript, and Vite, on top of the WeKnora backend.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Wiki System** - Rich text editing with Tiptap, document and folder management
+- **Knowledge Q&A** - RAG-based chat with streaming answers and source references
+- **Model Configuration** - Configure AI model providers, models, and credentials
+- **System Management** - Members & invitations, audit log, platform settings, task queues
+- **Account Settings** - Profile and password management
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **Frontend**: Vue 3, TypeScript
+- **Build**: Vite
+- **Routing**: Vue Router
+- **State**: Pinia (with persisted state), TanStack Vue Query
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn-vue (reka-ui)
+- **Editor**: Tiptap 3
+- **Validation**: vee-validate + zod
+- **Testing**: Vitest
 
-Note: This will impact Vite dev & build performances.
+## Getting Started
 
-## Expanding the ESLint configuration
+```bash
+# Install dependencies
+pnpm install
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# Start development server
+pnpm dev
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+# Build for production
+pnpm build
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+# Run tests
+pnpm test
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Available Scripts
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Type-check and build for production |
+| `pnpm preview` | Preview production build |
+| `pnpm test` | Run tests in watch mode |
+| `pnpm test:run` | Run tests once |
+| `pnpm lint` | Lint with oxlint |
+| `pnpm lint:fix` | Lint and auto-fix |
+| `pnpm lint:type` | TypeScript type check |
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+## Project Structure
+
+```
+src/
+├── api/                 # API clients (auth, wiki, ai, system)
+├── app/                 # App-level providers
+├── assets/              # Static assets (logos, icons)
+├── components/          # Shared UI components
+│   ├── ui/              # Base UI components (shadcn-vue)
+│   ├── sag-ui/          # Business-specific components (data-table, tree, pagination, etc.)
+│   └── stream-markdown/ # Streaming markdown rendering
+├── composables/         # Vue composables
+├── hooks/               # Shared hooks
+├── layout/              # Root layout components
+├── lib/                 # Third-party library configurations
+├── pages/               # Page components
+│   ├── ai/             # AI pages (knowledge Q&A, model config)
+│   ├── common/         # Shared pages (account, app-setting)
+│   ├── dashboard/      # Dashboard page
+│   ├── errors/         # Error pages (404)
+│   ├── login/          # Login page
+│   ├── system/         # System pages (members, audit log, settings, queue)
+│   └── wiki/           # Wiki pages (knowledge base, editor)
+├── router/              # Route definitions and guards
+├── stores/              # Pinia stores (auth, app state)
+├── test/                # Test setup and utilities
+├── types/               # TypeScript type definitions
+└── utils/               # Utility functions (request, color, helpers)
 ```

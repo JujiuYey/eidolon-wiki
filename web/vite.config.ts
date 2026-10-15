@@ -2,21 +2,12 @@ import path from "path";
 
 /// <reference types="vitest/config" />
 import tailwindcss from "@tailwindcss/vite";
-import tanstackRouter from "@tanstack/router-plugin/vite";
-import react from "@vitejs/plugin-react";
+import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vitest/config";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    tanstackRouter(),
-    react({
-      babel: {
-        plugins: [["babel-plugin-react-compiler"]],
-      },
-    }),
-    tailwindcss(),
-  ],
+  plugins: [vue(), tailwindcss()],
   resolve: {
     alias: [
       {
@@ -31,5 +22,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
+    // react-reference/ 是只读移植参考（sag-wiki 拷贝），其 React 测试不属于本仓库
+    exclude: ["**/node_modules/**", "react-reference/**"],
+    passWithNoTests: true,
   },
 });

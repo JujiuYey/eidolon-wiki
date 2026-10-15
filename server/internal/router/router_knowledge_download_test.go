@@ -1,0 +1,126 @@
+package router
+
+import (
+	"bytes"
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	apprepo "github.com/Tencent/WeKnora/internal/application/repository"
+	"github.com/Tencent/WeKnora/internal/handler"
+	"github.com/Tencent/WeKnora/internal/middleware"
+	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/require"
+)
+
+type downloadKnowledgeLookup struct {
+	knowledge *types.Knowledge
+}
+
+func (s *downloadKnowledgeLookup) GetKnowledgeByIDOnly(_ context.Context, id string) (*types.Knowledge, error) {
+	if s.knowledge != nil && s.knowledge.ID == id {
+		return s.knowledge, nil
+	}
+	return nil, apprepo.ErrKnowledgeNotFound
+}
+
+func newKnowledgeDownloadRouteTestEngine(
+	t *testing.T,
+	role types.TenantRole,
+	knowledge *types.Knowledge,
+	kb *types.KnowledgeBase,
+) *gin.Engine {
+	t.Helper()
+	gin.SetMode(gin.TestMode)
+
+	guards := &rbacGuards{
+		knowledgeService: &downloadKnowledgeLookup{knowledge: knowledge},
+		kbService:        &stubWikiKBLookup{kbs: map[string]*types.KnowledgeBase{kb.ID: kb}},
+	}
+
+	r := gin.New()
+	r.Use(middleware.ErrorHandler())
+	r.Use(func(c *gin.Context) {
+		ctx := context.WithValue(c.Request.Context(), types.TenantIDContextKey, uint64(1))
+		ctx = context.WithValue(ctx, types.TenantRoleContextKey, role)
+		c.Request = c.Request.WithContext(ctx)
+		c.Set(types.TenantIDContextKey.String(), uint64(1))
+		c.Next()
+	})
+	RegisterKnowledgeRoutes(r.Group("/api/v1"), &handler.KnowledgeHandler{}, guards)
+	return r
+}
+
+func TestKnowledgeDownloadRejectsTenantViewer(t *testing.T) {
+	engine := newKnowledgeDownloadRouteTestEngine(
+		t,
+		types.TenantRoleViewer,
+		&types.Knowledge{ID: "knowledge-own", KnowledgeBaseID: "kb-own", TenantID: 1},
+		&types.KnowledgeBase{ID: "kb-own", TenantID: 1},
+	)
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/knowledge/knowledge-own/download", nil)
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code, "body=%s", rec.Body.String())
+}
+
+func TestKnowledgeDownloadRejectsForeignKB(t *testing.T) {
+	// Ownership-only resolution: a KB owned by another workspace is
+	// forbidden even for a caller role that would pass the route gate.
+	engine := newKnowledgeDownloadRouteTestEngine(
+		t,
+		types.TenantRoleContributor,
+		&types.Knowledge{ID: "knowledge-foreign", KnowledgeBaseID: "kb-foreign", TenantID: 2},
+		&types.KnowledgeBase{ID: "kb-foreign", TenantID: 2},
+	)
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/knowledge/knowledge-foreign/download", nil)
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code, "body=%s", rec.Body.String())
+}
+
+func TestBatchKnowledgeDownloadRejectsTenantViewer(t *testing.T) {
+	engine := newKnowledgeDownloadRouteTestEngine(
+		t,
+		types.TenantRoleViewer,
+		&types.Knowledge{ID: "knowledge-own", KnowledgeBaseID: "kb-own", TenantID: 1},
+		&types.KnowledgeBase{ID: "kb-own", TenantID: 1},
+	)
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/api/v1/knowledge-bases/kb-own/knowledge/batch-download",
+		bytes.NewBufferString(`{"ids":["knowledge-own"]}`),
+	)
+	req.Header.Set("Content-Type", "application/json")
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code, "body=%s", rec.Body.String())
+}
+
+func TestBatchKnowledgeDownloadRejectsForeignKB(t *testing.T) {
+	engine := newKnowledgeDownloadRouteTestEngine(
+		t,
+		types.TenantRoleContributor,
+		&types.Knowledge{ID: "knowledge-foreign", KnowledgeBaseID: "kb-foreign", TenantID: 2},
+		&types.KnowledgeBase{ID: "kb-foreign", TenantID: 2},
+	)
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/api/v1/knowledge-bases/kb-foreign/knowledge/batch-download",
+		bytes.NewBufferString(`{"ids":["knowledge-foreign"]}`),
+	)
+	req.Header.Set("Content-Type", "application/json")
+	engine.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code, "body=%s", rec.Body.String())
+}

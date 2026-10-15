@@ -1,4 +1,4 @@
-import type { Editor } from "@tiptap/react";
+import type { Editor } from "@tiptap/core";
 import { Packer, ShadingType } from "docx";
 import { saveAs } from "file-saver";
 import { defaultMarks, defaultNodes, DocxSerializer } from "prosemirror-docx";

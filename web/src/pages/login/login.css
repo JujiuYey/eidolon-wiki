@@ -1,0 +1,171 @@
+/* 登录页专用样式。布局与颜色走 Tailwind + shadcn token（明暗自动跟随）；
+   这里只放 Tailwind 无法表达的链接色派生、环境层底纹与关键帧。 */
+
+/* 深一档的品牌色链接：亮色下白底小字满足 4.5:1 对比度，暗色直接用品牌色 */
+.sag-login-link {
+  color: color-mix(in oklab, var(--primary) 72%, var(--foreground));
+}
+
+.dark .sag-login-link {
+  color: var(--primary);
+}
+
+/* 点阵底纹：网格线的柔和形态，中心向四周淡出 */
+.sag-login-dots {
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1.2px);
+  background-position: center;
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 42%, #000 30%, transparent 78%);
+}
+
+/* 登录卡后的品牌色光晕（主光 + 远处柔光），主柔两团错相呼吸 */
+.sag-login-glow {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--primary) 15%, transparent),
+    transparent 72%
+  );
+}
+
+.sag-login-breathe {
+  animation: sag-glow-breathe var(--breathe-duration, 11s) ease-in-out var(--breathe-delay, 0s)
+    infinite alternate;
+}
+
+@keyframes sag-glow-breathe {
+  from {
+    opacity: 0.55;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.sag-login-glow--soft {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--primary) 8%, transparent),
+    transparent 70%
+  );
+}
+
+/* 虚线轨道环：绕登录卡缓慢公转，内环反向；卫星点画在环上随 SVG 整体转动 */
+.sag-login-orbit {
+  animation: sag-orbit var(--orbit-duration, 120s) linear infinite;
+}
+
+.sag-login-orbit--reverse {
+  animation-direction: reverse;
+}
+
+@keyframes sag-orbit {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* 远端向量点：错峰明灭 */
+.sag-login-dot {
+  animation: sag-dot-twinkle var(--dot-duration, 7s) ease-in-out var(--dot-delay, 0s) infinite;
+}
+
+@keyframes sag-dot-twinkle {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: scale(0.75);
+  }
+
+  50% {
+    opacity: 0.95;
+    transform: scale(1.2);
+  }
+}
+
+/* 十字测量标记：蓝图语言的残留，极淡 */
+.sag-login-cross {
+  height: 11px;
+  position: absolute;
+  width: 11px;
+}
+
+.sag-login-cross::before,
+.sag-login-cross::after {
+  background: color-mix(in oklab, var(--foreground) 22%, transparent);
+  content: "";
+  position: absolute;
+}
+
+.sag-login-cross::before {
+  height: 1px;
+  left: 0;
+  right: 0;
+  top: 50%;
+}
+
+.sag-login-cross::after {
+  bottom: 0;
+  left: 50%;
+  top: 0;
+  width: 1px;
+}
+
+/* 知识碎片缓慢漂浮，旋转角由变量保持 */
+.sag-login-chip {
+  animation: sag-chip-float var(--chip-duration, 15s) ease-in-out var(--chip-delay, 0s) infinite
+    alternate;
+}
+
+@keyframes sag-chip-float {
+  from {
+    transform: translateY(-12px) rotate(calc(var(--chip-rotate, 0deg) - 1.5deg));
+  }
+
+  to {
+    transform: translateY(14px) rotate(calc(var(--chip-rotate, 0deg) + 1.5deg));
+  }
+}
+
+/* 入场动效：一次编排，之后页面静止 */
+.sag-anim-enter {
+  animation: sag-enter 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sag-anim-card {
+  animation: sag-enter-card 720ms 100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes sag-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sag-enter-card {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sag-login *,
+  .sag-login *::before,
+  .sag-login *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

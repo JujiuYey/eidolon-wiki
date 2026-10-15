@@ -1,34 +1,31 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { defineStore } from "pinia";
 
-interface AppSettings {
-  autoSave: boolean;
+export interface AppSettings {
   theme: "system" | "light" | "dark";
 }
 
 interface AppState {
   settings: AppSettings;
-  updateSettings: (settings: Partial<AppSettings>) => void;
-  resetSettings: () => void;
 }
 
 const defaultSettings: AppSettings = {
-  autoSave: true,
   theme: "system",
 };
 
-export const useAppStore = create<AppState>()(
-  persist(
-    (set) => ({
-      settings: { ...defaultSettings },
-      updateSettings: (partial) =>
-        set((state) => ({
-          settings: { ...state.settings, ...partial },
-        })),
-      resetSettings: () => set({ settings: { ...defaultSettings } }),
-    }),
-    {
-      name: "app-setting",
+export const useAppStore = defineStore("app", {
+  state: (): AppState => ({
+    settings: { ...defaultSettings },
+  }),
+  actions: {
+    updateSettings(partial: Partial<AppSettings>) {
+      this.settings = { ...this.settings, ...partial };
     },
-  ),
-);
+    resetSettings() {
+      this.settings = { ...defaultSettings };
+    },
+  },
+  persist: {
+    key: "app-setting",
+    pick: ["settings"],
+  },
+});

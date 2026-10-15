@@ -1,0 +1,67 @@
+package dto
+
+import (
+	"context"
+	"time"
+
+	"github.com/Tencent/WeKnora/internal/types"
+	"gorm.io/gorm"
+)
+
+// TenantResponse is the viewer-safe tenant profile shape. Secret-bearing
+// columns are omitted or redacted unless the caller has Admin+.
+type TenantResponse struct {
+	ID                  uint64                     `json:"id"`
+	Name                string                     `json:"name"`
+	Description         string                     `json:"description"`
+	Status              string                     `json:"status"`
+	RetrieverEngines    types.RetrieverEngines     `json:"retriever_engines"`
+	Business            string                     `json:"business"`
+	StorageQuota        int64                      `json:"storage_quota"`
+	StorageUsed         int64                      `json:"storage_used"`
+	ContextConfig       *types.ContextConfig       `json:"context_config,omitempty"`
+	ParserEngineConfig  *types.ParserEngineConfig  `json:"parser_engine_config,omitempty"`
+	Credentials         *types.CredentialsConfig   `json:"credentials,omitempty"`
+	StorageEngineConfig *types.StorageEngineConfig `json:"storage_engine_config,omitempty"`
+	ChatHistoryConfig   *types.ChatHistoryConfig   `json:"chat_history_config,omitempty"`
+	RetrievalConfig     *types.RetrievalConfig     `json:"retrieval_config,omitempty"`
+	CreatedAt           time.Time                  `json:"created_at"`
+	UpdatedAt           time.Time                  `json:"updated_at"`
+	DeletedAt           gorm.DeletedAt             `json:"deleted_at"`
+}
+
+// NewTenantResponse converts a stored tenant into its HTTP response shape.
+func NewTenantResponse(ctx context.Context, tenant *types.Tenant) *TenantResponse {
+	return NewTenantResponseWithRole(tenant, RoleFromContext(ctx))
+}
+
+// NewTenantResponseWithRole converts a stored tenant using an explicit role
+// (for auth flows where tenant role is not yet in request context).
+func NewTenantResponseWithRole(tenant *types.Tenant, role types.TenantRole) *TenantResponse {
+	if tenant == nil {
+		return nil
+	}
+	includeSecrets := role.HasPermission(types.TenantRoleAdmin)
+	resp := &TenantResponse{
+		ID:                tenant.ID,
+		Name:              tenant.Name,
+		Description:       tenant.Description,
+		Status:            tenant.Status,
+		RetrieverEngines:  tenant.RetrieverEngines,
+		Business:          tenant.Business,
+		StorageQuota:      tenant.StorageQuota,
+		StorageUsed:       tenant.StorageUsed,
+		ContextConfig:     tenant.ContextConfig,
+		ChatHistoryConfig: tenant.ChatHistoryConfig,
+		RetrievalConfig:   tenant.RetrievalConfig,
+		CreatedAt:         tenant.CreatedAt,
+		UpdatedAt:         tenant.UpdatedAt,
+		DeletedAt:         tenant.DeletedAt,
+	}
+	if includeSecrets {
+		resp.ParserEngineConfig = types.ParserEngineConfigForResponse(tenant.ParserEngineConfig, true)
+		resp.Credentials = types.CredentialsConfigForResponse(tenant.Credentials, true)
+		resp.StorageEngineConfig = types.StorageEngineConfigForResponse(tenant.StorageEngineConfig, true)
+	}
+	return resp
+}

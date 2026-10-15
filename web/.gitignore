@@ -1,5 +1,27 @@
-# Logs
-logs
+# ===== 通用 =====
+.DS_Store
+.env
+.env.local
+.env.*.local
+*.log
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== 前端 =====
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 构建产物
+dist/
+dist-ssr/
+.vite/
+
+# 日志
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,20 +29,29 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+# 编辑器
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.local
 
-docs
+# 测试
+coverage/
+.nyc_output/
+
+# 其他
+.specstory/
+.cursorindexingignore
+.zcode/
+
+# ===== Claude 配置 =====
+.claude/settings.local.json
+
+# ===== Git Worktrees =====
+.worktrees/
+
+# React 版参考（Vue 重建期临时保留，勿提交）
+react-reference/

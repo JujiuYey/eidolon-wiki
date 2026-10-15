@@ -1,4 +1,4 @@
-import type { Editor } from "@tiptap/react";
+import type { Editor } from "@tiptap/core";
 
 import type { RangeStyle } from "./const";
 import { DEFAULT_RANGE_STYLE } from "./const";

@@ -1,0 +1,195 @@
+package middleware
+
+import (
+	"context"
+	"errors"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/Tencent/WeKnora/internal/types"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+)
+
+// rbacTestHarness builds a tiny gin engine with the RBAC middleware in
+// front of a no-op handler. It seeds context just like the real auth
+// middleware would, so RequireRole / RequireOwnershipOrRole see the
+// expected TenantRole and UserID.
+//
+// Returning the recorder rather than asserting inline keeps each test
+// case focused on the (input -> status) pair it cares about.
+func rbacTestHarness(role types.TenantRole, userID string, mw gin.HandlerFunc) *httptest.ResponseRecorder {
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	r.Use(func(c *gin.Context) {
+		// Mirror what middleware/auth.go's JWT path sets.
+		ctx := context.WithValue(c.Request.Context(), types.TenantRoleContextKey, role)
+		ctx = context.WithValue(ctx, types.UserIDContextKey, userID)
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	})
+	r.GET("/protected", mw, func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"ok": true})
+	})
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/protected", nil)
+	r.ServeHTTP(w, req)
+	return w
+}
+
+// ---------- RequireRole ----------
+
+func TestRequireRole_AllowsAtMin(t *testing.T) {
+	w := rbacTestHarness(types.TenantRoleAdmin, "u1",
+		RequireRole(types.TenantRoleAdmin))
+	if w.Code != http.StatusOK {
+		t.Fatalf("Admin should clear Admin gate, got %d", w.Code)
+	}
+}
+
+func TestRequireRole_AllowsAboveMin(t *testing.T) {
+	w := rbacTestHarness(types.TenantRoleOwner, "u1",
+		RequireRole(types.TenantRoleAdmin))
+	if w.Code != http.StatusOK {
+		t.Fatalf("Owner should clear Admin gate, got %d", w.Code)
+	}
+}
+
+func TestRequireRole_RejectsBelowMin(t *testing.T) {
+	w := rbacTestHarness(types.TenantRoleContributor, "u1",
+		RequireRole(types.TenantRoleAdmin))
+	if w.Code != http.StatusForbidden {
+		t.Fatalf("Contributor must NOT clear Admin gate, got %d", w.Code)
+	}
+}
+
+func TestRequireRoleOrSystemAdmin_AllowsSystemAdminBelowTenantRole(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	router := gin.New()
+	router.Use(func(c *gin.Context) {
+		ctx := context.WithValue(c.Request.Context(), types.TenantRoleContextKey, types.TenantRoleViewer)
+		ctx = context.WithValue(ctx, types.SystemAdminContextKey, true)
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	})
+	router.GET("/protected",
+		RequireRoleOrSystemAdmin(types.TenantRoleAdmin),
+		func(c *gin.Context) { c.Status(http.StatusOK) },
+	)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/protected", nil))
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestRequireRoleOrSystemAdmin_RejectsOrdinaryViewer(t *testing.T) {
+	w := rbacTestHarness(types.TenantRoleViewer, "u1",
+		RequireRoleOrSystemAdmin(types.TenantRoleAdmin))
+	if w.Code != http.StatusForbidden {
+		t.Fatalf("ordinary Viewer must not clear Admin-or-SystemAdmin gate, got %d", w.Code)
+	}
+}
+
+// ---------- RequireOwnershipOrRole ----------
+
+func TestRequireOwnershipOrRole_AdminBypassesLookup(t *testing.T) {
+	// Admin / Owner clear the role gate without touching the lookup,
+	// so an erroring lookup still passes when the caller has the role.
+	called := false
+	lookup := func(c *gin.Context) (string, error) {
+		called = true
+		return "", errors.New("must not be called")
+	}
+	w := rbacTestHarness(types.TenantRoleAdmin, "u1",
+		RequireOwnershipOrRole(types.TenantRoleAdmin, lookup))
+	if w.Code != http.StatusOK {
+		t.Fatalf("Admin should pass without lookup, got %d", w.Code)
+	}
+	if called {
+		t.Fatalf("lookup must not run when role already meets min")
+	}
+}
+
+func TestRequireOwnershipOrRole_CreatorAllowed(t *testing.T) {
+	lookup := func(c *gin.Context) (string, error) { return "u1", nil }
+	w := rbacTestHarness(types.TenantRoleContributor, "u1",
+		RequireOwnershipOrRole(types.TenantRoleAdmin, lookup))
+	if w.Code != http.StatusOK {
+		t.Fatalf("creator must clear ownership gate, got %d", w.Code)
+	}
+}
+
+func TestRequireOwnershipOrRole_NonCreatorContributorRejected(t *testing.T) {
+	// Contributor editing someone else's resource is the exact case the
+	// matrix targets: only the original creator OR Admin+ may proceed.
+	lookup := func(c *gin.Context) (string, error) { return "someone-else", nil }
+	w := rbacTestHarness(types.TenantRoleContributor, "u1",
+		RequireOwnershipOrRole(types.TenantRoleAdmin, lookup))
+	if w.Code != http.StatusForbidden {
+		t.Fatalf("non-creator Contributor must hit 403, got %d", w.Code)
+	}
+}
+
+func TestRequireOwnershipOrRole_LegacyEmptyCreatorTreatedAsTenantOwned(t *testing.T) {
+	// Pre-migration rows (or rows the backfill couldn't resolve) carry
+	// creator_id = "". Per the contract those are tenant-owned: only the
+	// role check decides.
+	lookup := func(c *gin.Context) (string, error) { return "", nil }
+	// Contributor on a tenant-owned row -> rejected, only Admin+ can mutate.
+	w := rbacTestHarness(types.TenantRoleContributor, "u1",
+		RequireOwnershipOrRole(types.TenantRoleAdmin, lookup))
+	if w.Code != http.StatusForbidden {
+		t.Fatalf("Contributor on legacy tenant-owned row should hit 403, got %d", w.Code)
+	}
+}
+
+func TestRequireOwnershipOrRole_LookupErrorReturns503(t *testing.T) {
+	// A transient lookup error surfaces as 503 (not 403) so monitoring
+	// and clients can tell "your permission was denied" from "the server
+	// briefly couldn't verify ownership". Failing open here would mean
+	// any DB hiccup on the creator query becomes a free pass.
+	lookup := func(c *gin.Context) (string, error) { return "", errors.New("boom") }
+	w := rbacTestHarness(types.TenantRoleContributor, "u1",
+		RequireOwnershipOrRole(types.TenantRoleAdmin, lookup))
+	if w.Code != http.StatusServiceUnavailable {
+		t.Fatalf("lookup error must surface as 503, got %d", w.Code)
+	}
+}
+
+func TestRequireOwnershipOrRole_NotFoundPassesThroughTo404(t *testing.T) {
+	// When the lookup signals "no such resource visible to this tenant",
+	// the middleware MUST NOT mask it as 403. The handler downstream
+	// gets to decide the right status (usually 404), which keeps client
+	// error handling honest and avoids hiding "wrong URL" behind a
+	// permissions error.
+	called := false
+	lookup := func(c *gin.Context) (string, error) {
+		return "", ErrResourceNotFound
+	}
+	router := gin.New()
+	router.Use(func(c *gin.Context) {
+		ctx := c.Request.Context()
+		ctx = context.WithValue(ctx, types.TenantRoleContextKey, types.TenantRoleContributor)
+		ctx = context.WithValue(ctx, types.UserIDContextKey, "u1")
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	})
+	router.GET("/protected",
+		RequireOwnershipOrRole(types.TenantRoleAdmin, lookup),
+		func(c *gin.Context) {
+			called = true
+			c.JSON(http.StatusNotFound, gin.H{"error": "kb not found"})
+		},
+	)
+	req := httptest.NewRequest(http.MethodGet, "/protected", nil)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	if !called {
+		t.Fatalf("handler should have been invoked so it can produce 404")
+	}
+	if w.Code != http.StatusNotFound {
+		t.Fatalf("expected handler 404 to win, got %d", w.Code)
+	}
+}

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "shadcn-vue/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -192,6 +192,10 @@
   }
 
   a[data-status="active"] .sidebar-nav-icon [data-tone="amber"] {
-    color: #ffb347;
+    color: #ffb938;
+  }
+
+  a[data-status="active"] .sidebar-nav-icon [data-tone="white"] {
+    color: #ffffff;
   }
 }

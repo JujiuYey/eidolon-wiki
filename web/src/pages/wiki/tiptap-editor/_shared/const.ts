@@ -1,4 +1,5 @@
-import type { Editor } from "@tiptap/react";
+import type { Editor } from "@tiptap/core";
+import type { ComputedRef, Ref } from "vue";
 
 export interface RangeStyle {
   bold: boolean;
@@ -18,9 +19,9 @@ export interface RangeStyle {
 }
 
 export interface ToolbarContextValue {
-  editor: Editor | null;
-  rangeStyle: RangeStyle;
-  docTitle: string;
+  editor: Ref<Editor | null | undefined>;
+  rangeStyle: ComputedRef<RangeStyle>;
+  docTitle: Ref<string>;
 }
 
 export const DEFAULT_RANGE_STYLE: RangeStyle = {

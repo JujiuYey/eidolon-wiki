@@ -28,7 +28,6 @@ server/vendor/
 
 # IDE
 .idea/
-.vscode/
 *.swp
 *.swo
 *~
@@ -52,8 +51,6 @@ web/pnpm-debug.log*
 web/lerna-debug.log*
 
 # 编辑器
-web/.vscode/*
-!web/.vscode/extensions.json
 web/.idea
 web/*.suo
 web/*.ntvs*
@@ -65,13 +62,6 @@ web/*.local
 # 测试
 web/coverage/
 web/.nyc_output/
-
-# 其他
-web/.specstory/
-web/.cursorindexingignore
-
-# ===== Claude 配置 =====
-.claude/settings.local.json
 
 # ===== Git Worktrees =====
 .worktrees/

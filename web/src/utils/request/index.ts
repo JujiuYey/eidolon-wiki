@@ -1,148 +1,231 @@
-import type { AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
-import axios from "axios";
-import { toast } from "sonner";
+import axios, { type AxiosRequestConfig, type InternalAxiosRequestConfig } from "axios";
 
 import { useAuthStore } from "@/stores/auth";
 
-export interface ApiResponse<T = unknown> {
-  code: number;
-  data: T;
-  message: string;
-}
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.BASE_URL || "/";
+const normalizedBaseUrl = API_BASE_URL.replace(/\/$/, "");
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: normalizedBaseUrl,
   timeout: 30000,
+  headers: { "Content-Type": "application/json" },
 });
 
-// Token 刷新队列
+type RetriableRequest = InternalAxiosRequestConfig & { _retry?: boolean };
+type FailedRequest = {
+  resolve: (token: string) => void;
+  reject: (error: unknown) => void;
+};
+
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let failedQueue: FailedRequest[] = [];
 
-function subscribeTokenRefresh(cb: (token: string) => void) {
-  refreshSubscribers.push(cb);
+function processQueue(error: unknown, token?: string) {
+  for (const request of failedQueue) {
+    if (error) request.reject(error);
+    else if (token) request.resolve(token);
+  }
+  failedQueue = [];
 }
 
-function onRefreshed(token: string) {
-  refreshSubscribers.forEach((cb) => cb(token));
-  refreshSubscribers = [];
+function getCurrentLanguage(): string {
+  return localStorage.getItem("locale") || "zh-CN";
 }
 
-async function refreshToken(): Promise<string | null> {
-  const { refreshToken: refresh, setAccessToken } = useAuthStore.getState();
-  if (!refresh) return null;
+function isPublicAuthRequest(url?: string): boolean {
+  if (!url) return false;
+  return [
+    "/auth/auto-setup",
+    "/auth/login",
+    "/auth/register",
+    "/auth/oidc/",
+    "/auth/invitations/lookup",
+    "/api/v1/embed/",
+  ].some((path) => url.includes(path));
+}
+
+function isEmbedPage(): boolean {
+  return typeof window !== "undefined" && window.location.pathname.startsWith("/embed/");
+}
+
+function redirectToLogin() {
+  if (typeof window === "undefined") return;
+  if (window.location.pathname !== "/login" && !isEmbedPage()) {
+    window.location.href = "/login";
+  }
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const auth = useAuthStore();
+  if (!auth.refreshToken) return null;
 
   try {
-    const { data } = await axios.post<ApiResponse<{ access_token: string }>>(
-      `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
-      { refresh_token: refresh },
-    );
-    if (data.code === 0 && data.data.access_token) {
-      setAccessToken(data.data.access_token);
-      return data.data.access_token;
+    const response = await axios.post<
+      | { success?: boolean; access_token?: string; refresh_token?: string }
+      | { code?: number; data?: { access_token?: string } }
+    >(`${normalizedBaseUrl}/api/v1/auth/refresh`, { refreshToken: auth.refreshToken });
+    const data = response.data;
+    const token =
+      ("success" in data && data.success ? data.access_token : undefined) ||
+      ("code" in data && data.code === 0 ? data.data?.access_token : undefined);
+
+    if (token) {
+      if ("success" in data && data.refresh_token) {
+        auth.setTokens(token, data.refresh_token);
+      } else {
+        auth.setAccessToken(token);
+      }
+      return token;
     }
-  } catch (error) {
-    toast.error("刷新 token 失败", {
-      description: error instanceof Error ? error.message : "未知错误",
-    });
+  } catch {
+    // The response interceptor clears auth and redirects below.
   }
   return null;
 }
 
-// 请求拦截器
 instance.interceptors.request.use((config) => {
-  const { accessToken } = useAuthStore.getState();
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+  const existingAuth = config.headers?.Authorization ?? config.headers?.authorization;
+  const isEmbedAuth = typeof existingAuth === "string" && existingAuth.startsWith("Embed ");
+  const isEmbedPath = typeof config.url === "string" && config.url.includes("/api/v1/embed/");
+
+  if (!isEmbedAuth) {
+    const { accessToken } = useAuthStore();
+    if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
   }
-  // FormData 时删除 Content-Type，让浏览器自动处理 boundary
-  if (config.data instanceof FormData) {
-    delete config.headers["Content-Type"];
+
+  config.headers["Accept-Language"] = getCurrentLanguage();
+
+  if (!isEmbedAuth && !isEmbedPath) {
+    const tenantId = localStorage.getItem("weknora_selected_tenant_id");
+    if (tenantId) config.headers["X-Tenant-ID"] = tenantId;
   }
+
+  config.headers["X-Request-ID"] =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2);
+
+  if (config.data instanceof FormData) delete config.headers["Content-Type"];
   return config;
 });
 
-// 响应拦截器
 instance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (axios.isCancel(error)) {
-      toast.error("请求已取消");
-      return Promise.reject(error);
-    }
-
-    if (error.code === "ECONNABORTED") {
-      toast.error("请求超时");
-      return Promise.reject(new Error("请求超时"));
-    }
-
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+  (response) => response.data,
+  async (error: any) => {
+    const originalRequest = error.config as RetriableRequest | undefined;
     const status = error.response?.status;
 
-    // 401 处理：尝试刷新 token
+    if (!error.response) return Promise.reject({ message: "网络请求失败" });
+
+    if ((status === 401 || status === 403) && isPublicAuthRequest(originalRequest?.url)) {
+      const data = error.response.data;
+      const message =
+        typeof data === "object" ? data?.error?.message || data?.error || data?.message : data;
+      return Promise.reject({ status, message: message || "认证失败" });
+    }
+
+    if (status === 401 && isEmbedPage()) {
+      return Promise.reject({ status, message: "认证失败" });
+    }
+
     if (
       status === 401 &&
+      originalRequest &&
       !originalRequest._retry &&
-      !originalRequest.url?.includes("/auth/login") &&
       !originalRequest.url?.includes("/auth/refresh")
     ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          subscribeTokenRefresh((newToken) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            instance(originalRequest).then(resolve).catch(reject);
+          failedQueue.push({
+            resolve: (token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              instance(originalRequest).then(resolve).catch(reject);
+            },
+            reject,
           });
         });
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
-
       try {
-        const newToken = await refreshToken();
-        if (newToken) {
-          onRefreshed(newToken);
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        const token = await refreshAccessToken();
+        if (token) {
+          processQueue(undefined, token);
+          originalRequest.headers.Authorization = `Bearer ${token}`;
           return instance(originalRequest);
         }
-        useAuthStore.getState().clearAuth();
-        window.location.href = "/login";
-        return Promise.reject(new Error("登录已过期"));
+
+        const expired = new Error("登录已过期");
+        processQueue(expired);
+        useAuthStore().clearAuth();
+        redirectToLogin();
+        return Promise.reject(expired);
       } finally {
         isRefreshing = false;
       }
     }
 
-    const msg = error.response?.data?.message || error.message || "请求失败";
-    toast.error("请求失败", { description: msg });
-    return Promise.reject(error);
+    const data = error.response.data;
+    const message =
+      typeof data === "object" ? data?.error?.message || data?.error || data?.message : data;
+    return Promise.reject({
+      status,
+      message: message || error.message || "请求失败",
+      ...(typeof data === "object" && data ? data : {}),
+    });
   },
 );
 
-// 业务解包
-async function unwrap<T>(
-  promise: Promise<import("axios").AxiosResponse<ApiResponse<T>>>,
+function get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  return instance.get<T>(url, config) as unknown as Promise<T>;
+}
+
+function getDown(url: string, config?: AxiosRequestConfig): Promise<Blob> {
+  return instance.get<Blob>(url, { ...config, responseType: "blob" }) as unknown as Promise<Blob>;
+}
+
+function post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return instance.post<T>(url, data, config) as unknown as Promise<T>;
+}
+
+function postUpload<T = unknown>(
+  url: string,
+  data: unknown = {},
+  onUploadProgress?: (progressEvent: unknown) => void,
+  config: AxiosRequestConfig = {},
 ): Promise<T> {
-  const res = await promise;
-  const json = res.data;
-  if (json.code === 0) return json.data;
-  toast.error("操作失败", { description: json.message || "未知错误" });
-  throw new Error(json.message || "未知错误");
+  return instance.post<T>(url, data, {
+    ...config,
+    headers: { "Content-Type": "multipart/form-data", ...config.headers },
+    onUploadProgress: onUploadProgress || config.onUploadProgress,
+  }) as unknown as Promise<T>;
 }
 
-// 便捷方法
-export function request<T = unknown>(url: string, config?: AxiosRequestConfig) {
-  return unwrap<T>(instance<ApiResponse<T>>(url, config));
+function postChat<T = unknown>(url: string, data: unknown = {}, config?: AxiosRequestConfig): Promise<T> {
+  return post<T>(url, data, {
+    ...config,
+    headers: { "Content-Type": "text/event-stream;charset=utf-8", ...config?.headers },
+  });
 }
 
-request.get = <T = unknown>(url: string, config?: AxiosRequestConfig) =>
-  unwrap<T>(instance.get<ApiResponse<T>>(url, config));
+function put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return instance.put<T>(url, data, config) as unknown as Promise<T>;
+}
 
-request.post = <T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
-  unwrap<T>(instance.post<ApiResponse<T>>(url, data, config));
+function patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return instance.patch<T>(url, data, config) as unknown as Promise<T>;
+}
 
-request.put = <T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) =>
-  unwrap<T>(instance.put<ApiResponse<T>>(url, data, config));
+function del<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return instance.delete<T>(url, { ...config, data }) as unknown as Promise<T>;
+}
 
-request.delete = <T = unknown>(url: string, config?: AxiosRequestConfig) =>
-  unwrap<T>(instance.delete<ApiResponse<T>>(url, config));
+const request = Object.assign(
+  <T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> =>
+    instance<T>(url, config) as unknown as Promise<T>,
+  { get, post, put, patch, delete: del, del, postUpload, postChat, getDown },
+);
+
+export { del, get, getDown, patch, post, postChat, postUpload, put, request };
+export type { AxiosRequestConfig };
